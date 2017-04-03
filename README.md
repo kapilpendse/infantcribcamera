@@ -15,10 +15,15 @@ This is a concept demo for a door lock equipped with AI capabilities such as voi
 * SoX (rec)
 * AWS IAM account API key and secret set up correctly on the Raspberry Pi ~/.aws/. The IAM account must have access to the following services: S3, Polly and Lex.
 * IoT device certificates
+* Configure audio defaults on the RPi to use USB audio dongle
 
 ### How do I get set up? ###
 
-* Summary of set up
+* Setup of USB audio dongle
+vi ~/.asoundrc and replace the contents with below 2 lines:
+pcm.!default plughw:Device
+ctl.!default plughw:Device
+
 * Configuration
 * Dependencies
 * Database configuration
