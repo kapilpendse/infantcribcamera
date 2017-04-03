@@ -50,6 +50,11 @@ int cmdHandlerCapturePhoto(MQTTCallbackParams params) {
 	system("sh `pwd`/scripts/capture.sh \"" POLLY_PROMPT_LOOK_AT_CAMERA "\" \"" POLLY_PROMPT_WAIT_A_MOMENT "\"");
 }
 
+int cmdHandlerFrFailure(MQTTCallbackParams params) {
+	INFO("Facial Recognition Failed");
+	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_FR_FAILURE "\"");
+}
+
 int cmdHandlerUpdatePasscode(MQTTCallbackParams params) {
 	INFO("Update Passcode");
 	char *pPasscode = ((char*)params.MessageParams.pPayload)+strlen(CMD_UPDATE_PASSCODE)+1;
@@ -81,6 +86,9 @@ int MQTTcallbackHandler(MQTTCallbackParams params) {
 			(int)params.MessageParams.PayloadLen, (char*)params.MessageParams.pPayload);
 	if(strncmp((char*)params.MessageParams.pPayload, CMD_CAPTURE_PHOTO, (int)params.MessageParams.PayloadLen) == 0) {
 		cmdHandlerCapturePhoto(params);
+	}
+	else if(strncmp((char*)params.MessageParams.pPayload, CMD_FR_FAILURE, (int)params.MessageParams.PayloadLen) == 0) {
+		cmdHandlerFrFailure(params);
 	}
 	else if(strncmp((char*)params.MessageParams.pPayload, CMD_UPDATE_PASSCODE, strlen(CMD_UPDATE_PASSCODE)) == 0) {
 		cmdHandlerUpdatePasscode(params);

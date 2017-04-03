@@ -10,10 +10,11 @@ This is a concept demo for a door lock equipped with AI capabilities such as voi
 
 * Raspberry Pi 3 with PiCam 2
 * AWS IoT SDK for C, and it's prereq openssl
-* mpg123
+* mpg123 (sudo apt-get install mpg123)
 * Python
 * SoX (rec)
 * AWS IAM account API key and secret set up correctly on the Raspberry Pi ~/.aws/. The IAM account must have access to the following services: S3, Polly and Lex.
+* AWS default region set up to point to 'us-east-1' on the Raspberry Pi ~/.aws/. Currently Rekognition & Lex are available only in us-east-1.
 * IoT device certificates
 * Configure audio defaults on the RPi to use USB audio dongle
 
