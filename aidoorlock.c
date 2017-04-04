@@ -46,13 +46,13 @@ static char passcode[5] = "0000";
 
 int cmdHandlerCapturePhoto(MQTTCallbackParams params) {
 	INFO("Capture Photo");
-	// system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_LOOK_AT_CAMERA "\"");
-	system("sh `pwd`/scripts/capture.sh \"" POLLY_PROMPT_LOOK_AT_CAMERA "\" \"" POLLY_PROMPT_WAIT_A_MOMENT "\"");
+	//important to add '&' at end of command so that the MQTT subscription of this program does not get blocked (and timed out)
+	system("sh `pwd`/scripts/capture.sh \"" POLLY_PROMPT_LOOK_AT_CAMERA "\" \"" POLLY_PROMPT_WAIT_A_MOMENT "\" &");
 }
 
 int cmdHandlerFrFailure(MQTTCallbackParams params) {
 	INFO("Facial Recognition Failed");
-	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_FR_FAILURE "\"");
+	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_FR_FAILURE "\" &");
 }
 
 int cmdHandlerUpdatePasscode(MQTTCallbackParams params) {
@@ -64,18 +64,17 @@ int cmdHandlerUpdatePasscode(MQTTCallbackParams params) {
 
 int cmdHandlerAskSecret(MQTTCallbackParams params) {
 	INFO("Ask Secret");
-	//system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_ASK_SECRET "\"");
-	system("sh `pwd`/scripts/passcode.sh \"" POLLY_PROMPT_ASK_SECRET "\" \"" POLLY_PROMPT_WAIT_A_MOMENT "\"");
+	system("sh `pwd`/scripts/passcode.sh \"" POLLY_PROMPT_ASK_SECRET "\" \"" POLLY_PROMPT_WAIT_A_MOMENT "\" &");
 }
 
 int cmdHandlerAllowAccess(MQTTCallbackParams params) {
 	INFO("Allow Access");
-	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_ALLOW_ACCESS "\"");
+	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_ALLOW_ACCESS "\" &");
 }
 
 int cmdHandlerDenyAccess(MQTTCallbackParams params) {
 	INFO("Deny Access");
-	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_DENY_ACCESS "\"");
+	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_DENY_ACCESS "\" &");
 }
 
 int MQTTcallbackHandler(MQTTCallbackParams params) {
