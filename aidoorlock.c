@@ -64,7 +64,7 @@ int cmdHandlerUpdatePasscode(MQTTCallbackParams params) {
 
 int cmdHandlerAskSecret(MQTTCallbackParams params) {
 	INFO("Ask Secret");
-	system("sh `pwd`/scripts/passcode.sh \"" POLLY_PROMPT_ASK_SECRET "\" \"" POLLY_PROMPT_WAIT_A_MOMENT "\" &");
+	system("sh `pwd`/scripts/passcode.sh \"" POLLY_PROMPT_ASK_SECRET "\" &");
 }
 
 int cmdHandlerAllowAccess(MQTTCallbackParams params) {

@@ -1,3 +1,4 @@
+import io
 import sys
 import boto3
 
@@ -15,11 +16,14 @@ try:
 	print(response)
 
 	#send the spoken passcode for interpretation
-	response = lex.post_text(
+	audioFile = io.open(sys.argv[1], "rb")
+	response = lex.post_content(
 		botName='EchoBot',
 		botAlias='Dev',
 		userId='747',
-		inputText='1234'
+		contentType='audio/l16; rate=16000; channels=1',
+		accept='text/plain; charset=utf-8',
+		inputStream=audioFile
 	)
 	print(response)
 
@@ -34,4 +38,4 @@ try:
 
 except:
 	print("There was an exception")
-	print(sys.exc_info()[0])
+	print(sys.exc_info())
