@@ -19,13 +19,17 @@ def generateNewPasscode():
     return str(random.randint(1000, 9999))
 
 def sendPasscodeToGuest(passcode):
-    sns = boto3.client('sns')
-    phonenumber = '+6588580447'
-    sns.publish(PhoneNumber = phonenumber, Message=str(passcode))
+    try:
+        sns = boto3.client('sns')
+        phonenumber = '+6588580447'
+        sns.publish(PhoneNumber = phonenumber, Message=passcode)
+    except AuthorizationErrorException:
+        print("AuthorizationErrorException: does this lambda function's IAM role have access to SNS to send SMS?")
     return 0
 
 def updatePasscode():
     newPasscode = generateNewPasscode()
+    print("New passcode is " + newPasscode)
     sendPasscodeToGuest(newPasscode)
     sendCommandToLock('UPDATE PASSCODE ' + newPasscode)
     return 0
