@@ -60,6 +60,7 @@ int cmdHandlerUpdatePasscode(MQTTCallbackParams params) {
 	char *pPasscode = ((char*)params.MessageParams.pPayload)+strlen(CMD_UPDATE_PASSCODE)+1;
 	strncpy(passcode, pPasscode, 4);
 	INFO("New passcode is %s", passcode);
+	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_SENDING_SMS "\" &");
 }
 
 int cmdHandlerAskSecret(MQTTCallbackParams params) {
