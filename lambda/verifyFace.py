@@ -1,6 +1,7 @@
 import sys
 import boto3
 import json
+import random
 # from botocore.errorfactory import InvalidParameterException
 
 rekognition = boto3.client('rekognition', region_name='us-east-1')
@@ -12,6 +13,21 @@ def sendCommandToLock(command):
         payload=command
     )
     print(iotResponse)
+    return 0
+
+def generateNewPasscode():
+    return str(random.randint(1000, 9999))
+
+def sendPasscodeToGuest(passcode):
+    sns = boto3.client('sns')
+    phonenumber = '+6588580447'
+    sns.publish(PhoneNumber = phonenumber, Message=str(passcode))
+    return 0
+
+def updatePasscode():
+    newPasscode = generateNewPasscode()
+    sendPasscodeToGuest(newPasscode)
+    sendCommandToLock('UPDATE PASSCODE ' + newPasscode)
     return 0
 
 def lambda_handler(event, context):
@@ -47,7 +63,8 @@ def lambda_handler(event, context):
     
             if(similarity > 80):
                 print("It is a match!")
-                sendCommandToLock('ALLOW ACCESS')
+                updatePasscode()
+                sendCommandToLock('ASK SECRET')
             else:
                 print("Face does not match!")
                 sendCommandToLock('FACIAL VERIFICATION FAILED')

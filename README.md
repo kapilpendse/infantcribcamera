@@ -17,6 +17,7 @@ This is a concept demo for a door lock equipped with AI capabilities such as voi
 * AWS default region set up to point to 'us-east-1' on the Raspberry Pi ~/.aws/. Currently Rekognition & Lex are available only in us-east-1.
 * IoT device certificates
 * Configure audio defaults on the RPi to use USB audio dongle
+* AWS SNS configured for sending out SMS, with default spending limit increased to suitable value
 
 ### How do I get set up? ###
 
