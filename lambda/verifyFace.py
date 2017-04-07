@@ -6,6 +6,7 @@ import random
 
 rekognition = boto3.client('rekognition', region_name='us-east-1')
 iotData = boto3.client('iot-data', region_name='ap-southeast-1')
+guestInfoTable = boto3.resource('dynamodb').Table('LocksGuestInfo')
 
 def sendCommandToLock(command):
     iotResponse = iotData.publish(
@@ -18,11 +19,36 @@ def sendCommandToLock(command):
 def generateNewPasscode():
     return str(random.randint(1000, 9999))
 
+def saveNewPasscode(passcode):
+    response = guestInfoTable.update_item(
+        Key={
+            'GuestId': 1
+        },
+        UpdateExpression="set Passcode = :p",
+        ExpressionAttributeValues={
+            ":p": passcode
+        },
+        ReturnValues='UPDATED_NEW'
+    )
+    # print("DDB operation: " + response)
+    return 0
+
 def sendPasscodeToGuest(passcode):
     try:
         sns = boto3.client('sns')
         phonenumber = '+6588580447'
-        sns.publish(PhoneNumber = phonenumber, Message=passcode)
+        response = sns.publish(PhoneNumber = phonenumber, Message=passcode)
+        print("SMS passcode sent to guest, message ID is " + response['MessageId'])
+        response = guestInfoTable.update_item(
+            Key={
+                'GuestId': 1
+            },
+            UpdateExpression="set MessageId = :m",
+            ExpressionAttributeValues={
+                ":m": response['MessageId']
+            },
+            ReturnValues='UPDATED_NEW'
+        )
     except AuthorizationErrorException:
         print("AuthorizationErrorException: does this lambda function's IAM role have access to SNS to send SMS?")
     return 0
@@ -30,6 +56,7 @@ def sendPasscodeToGuest(passcode):
 def updatePasscode():
     newPasscode = generateNewPasscode()
     print("New passcode is " + newPasscode)
+    saveNewPasscode(newPasscode)
     sendPasscodeToGuest(newPasscode)
     sendCommandToLock('UPDATE PASSCODE ' + newPasscode)
     return 0
@@ -68,7 +95,7 @@ def lambda_handler(event, context):
             if(similarity > 80):
                 print("It is a match!")
                 updatePasscode()
-                sendCommandToLock('ASK SECRET')
+                # sendCommandToLock('ALLOW ACCESS')
             else:
                 print("Face does not match!")
                 sendCommandToLock('FACIAL VERIFICATION FAILED')
