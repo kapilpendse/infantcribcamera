@@ -65,7 +65,17 @@ int cmdHandlerUpdatePasscode(MQTTCallbackParams params) {
 
 int cmdHandlerAskSecret(MQTTCallbackParams params) {
 	INFO("Ask Secret");
-	system("sh `pwd`/scripts/passcode.sh \"" POLLY_PROMPT_ASK_SECRET "\" &");
+	char command[1000];
+	bzero(command, sizeof(command));
+	sprintf(command,
+		"%s %s %s %s %s",
+		"sh `pwd`/scripts/passcode.sh ",
+		passcode,
+		" \"" POLLY_PROMPT_ASK_SECRET "\"",
+		" \"" POLLY_PROMPT_ALLOW_ACCESS "\"",
+		" \"" POLLY_PROMPT_DENY_ACCESS "\" &");
+	system(command);
+	//system("sh `pwd`/scripts/passcode.sh \"" POLLY_PROMPT_ASK_SECRET "\" &");
 }
 
 int cmdHandlerAllowAccess(MQTTCallbackParams params) {
@@ -76,6 +86,11 @@ int cmdHandlerAllowAccess(MQTTCallbackParams params) {
 int cmdHandlerDenyAccess(MQTTCallbackParams params) {
 	INFO("Deny Access");
 	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_DENY_ACCESS "\" &");
+}
+
+int cmdHandlerSMSFailed(MQTTCallbackParams params) {
+	INFO("SMS Failed");
+	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_SMS_FAILED "\" &");
 }
 
 int MQTTcallbackHandler(MQTTCallbackParams params) {
@@ -101,6 +116,9 @@ int MQTTcallbackHandler(MQTTCallbackParams params) {
 	}
 	else if(strncmp((char*)params.MessageParams.pPayload, CMD_DENY_ACCESS, (int)params.MessageParams.PayloadLen) == 0) {
 		cmdHandlerDenyAccess(params);
+	}
+	else if(strncmp((char*)params.MessageParams.pPayload, CMD_SMS_FAILED, (int)params.MessageParams.PayloadLen) == 0) {
+		cmdHandlerSMSFailed(params);
 	}
 
 	return 0;
