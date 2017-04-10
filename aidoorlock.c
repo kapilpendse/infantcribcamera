@@ -359,12 +359,12 @@ int main(int argc, char** argv) {
 		//Max time the yield function will wait for read messages
 		rc = aws_iot_mqtt_yield(100);
 		if(NETWORK_ATTEMPTING_RECONNECT == rc){
-			INFO("-->sleep");
+			//INFO("-->sleep");
 			sleep(1);
 			// If the client is attempting to reconnect we will skip the rest of the loop.
 			continue;
 		}
-		INFO("-->sleep");
+		//INFO("-->sleep");
 		sleep(1);
 /*
 		sprintf(cPayload, "%s : %d ", "hello from SDK", i++);
