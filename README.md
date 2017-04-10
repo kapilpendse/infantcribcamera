@@ -29,6 +29,11 @@ ctl.!default plughw:Device
 * Lambda Functions
     * Set up iotButtonDoorbellPressed.py in Singapore region, to be triggered by the AWS IoT button.
     * Set up verifyFace.py in N. Virginia region (because it needs to access Rekognition), to be triggered by image.jpg upload to S3 bucket 'raspi3locksuseast1'. This upload is done by the aidoorlock program from Rasbperry Pi.
+
+* Autostart on bootup
+    * To auto run the application on Raspberry Pi bootup, create links under /etc/network/if-up.d/ and /etc/network/if-down.d/ as below:
+    * sudo ln -s /home/pi/deviceSDK/linux_mqtt_openssl/sample_apps/aidoorlock/ifup.sh /etc/network/if-up.d/aidoorlock
+    * sudo ln -s /home/pi/deviceSDK/linux_mqtt_openssl/sample_apps/aidoorlock/ifdown.sh /etc/network/if-down.d/aidoorlock
 * Dependencies
 * Database configuration
 * How to run tests

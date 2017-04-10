@@ -9,6 +9,7 @@
 #define CMD_DENY_ACCESS		"DENY ACCESS"
 #define CMD_SMS_FAILED		"SMS FAILED"
 
+#define POLLY_PROMPT_READY		"<speak>Doorlock is ready</speak>"
 #define POLLY_PROMPT_LOOK_AT_CAMERA	"<speak>Hello! Please look at the camera. Remember to remove your glasses if you are wearing any.<break time='1s'/> Three. Two. One. And click!</speak>"
 #define POLLY_PROMPT_WAIT_A_MOMENT	"<speak>Please wait a moment.</speak>"
 #define POLLY_PROMPT_FR_FAILURE		"<speak>Nope. I could not find you on the expected guest list. Go away!</speak>"

@@ -35,6 +35,14 @@
 #include <sys/time.h>
 #include <limits.h>
 
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <netinet/in.h>
+#include <net/if.h>
+#include <arpa/inet.h>
+
 #include "aws_iot_log.h"
 #include "aws_iot_version.h"
 #include "aws_iot_mqtt_interface.h"
@@ -43,6 +51,63 @@
 #include "constants.h"
 
 static char passcode[5] = "0000";
+
+void getSelfIP(char *iface, char* ip) {
+	int fd;
+	struct ifreq ifr;
+
+	fd = socket(AF_INET, SOCK_DGRAM, 0);
+	ifr.ifr_addr.sa_family = AF_INET;
+
+	strncpy(ifr.ifr_name, iface, IFNAMSIZ-1);
+	ioctl(fd, SIOCGIFADDR, &ifr);
+	//printf("%s\n", inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
+	sprintf(ip, "%s\n", inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
+
+	close(fd);
+}
+
+int onStartup() {
+	INFO("Announcing startup");
+	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_READY "\" &");
+
+	//publish own IP address to topic "locks/ip"
+	IoT_Error_t rc = NONE_ERROR;
+	MQTTMessageParams Msg = MQTTMessageParamsDefault;
+	Msg.qos = QOS_0;
+	char cPayload[100];
+
+	MQTTPublishParams Params = MQTTPublishParamsDefault;
+	Params.pTopic = "locks/ip";
+
+	char wlan0_ip[50] = "";
+	getSelfIP("wlan0", wlan0_ip);
+	sprintf(cPayload, "wlan0 IP address is %s", wlan0_ip);
+	Msg.pPayload = (void *) cPayload;
+	Msg.PayloadLen = strlen(cPayload) + 1;
+
+	Params.MessageParams = Msg;
+	rc = aws_iot_mqtt_publish(&Params);
+	if(rc != NONE_ERROR) {
+		printf("Error publishing IP address to 'locks/ip'\n");
+	}
+
+	printf("wlan0 IP address is %s", wlan0_ip);
+
+	char eth0_ip[50] = "";
+	getSelfIP("eth0", eth0_ip);
+	sprintf(cPayload, "eth0 IP address is %s", eth0_ip);
+	Msg.pPayload = (void *) cPayload;
+	Msg.PayloadLen = strlen(cPayload) + 1;
+
+	Params.MessageParams = Msg;
+	rc = aws_iot_mqtt_publish(&Params);
+	if(rc != NONE_ERROR) {
+		printf("Error publishing IP address to 'locks/ip'\n");
+	}
+
+	printf("eth0 IP address is %s", eth0_ip);
+}
 
 int cmdHandlerCapturePhoto(MQTTCallbackParams params) {
 	INFO("Capture Photo");
@@ -284,6 +349,9 @@ int main(int argc, char** argv) {
 	if (publishCount != 0) {
 		infinitePublishFlag = false;
 	}
+
+	//Announce readiness
+	onStartup();
 
 	while ((NETWORK_ATTEMPTING_RECONNECT == rc || RECONNECT_SUCCESSFUL == rc || NONE_ERROR == rc)
 			&& (publishCount > 0 || infinitePublishFlag)) {
