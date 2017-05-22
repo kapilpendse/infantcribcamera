@@ -10,7 +10,10 @@ python `pwd`/scripts/speak.py "$1"
 #raspistill -w 800 -h 600 -q 70 -t 2 -o "/home/pi/camera_captures/image.jpg"
 
 # Capture image using USB webcam
-fswebcam -r 1280x720 --no-banner --jpeg 100 -S 13 "/home/pi/camera_captures/image.jpg"
+#fswebcam -r 1280x720 --no-banner --jpeg 100 -S 13 "/home/pi/camera_captures/image.jpg"
+
+# Capture image using Mac's built-in webcam (FaceTime camera)
+imagesnap -w 1.5 camera_captures/image.jpg
 
 # voice prompt after taking photo
 python `pwd`/scripts/speak.py "$2"

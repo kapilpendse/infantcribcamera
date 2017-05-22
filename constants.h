@@ -1,5 +1,6 @@
 
 #define TOPIC_LOCKS_CMD		"locks/commands"
+#define TOPIC_LOCKS_IP		"locks/ip"
 
 #define CMD_CAPTURE_PHOTO	"CAPTURE PHOTO"
 #define CMD_FR_FAILURE		"FACIAL VERIFICATION FAILED"
