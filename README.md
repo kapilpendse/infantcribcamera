@@ -44,29 +44,33 @@ This is a concept demo for a door lock equipped with AI capabilities such as voi
 
 ### How do I get set up? ###
 
-* Setup of USB audio dongle
+#### Setup on MAC OSX
+1. Download the AWS IoT Device SDK 2.1.1 source code (https://github.com/aws/aws-iot-device-sdk-embedded-C/archive/v2.1.1.tar.gz)
+2. cd aws-iot-device-sdk-embedded-C-2.1.1/external_libs/mbedTLS/
+3. Download mbedTLS source code from https://github.com/ARMmbed/mbedtls/releases/tag/mbedtls-2.1.1 and extract all files in this folder. When done right, this folder should have several files including a Makefile.
+4. cd ../../samples/linux
+5. Clone 'aidoorlock' in this directory
+6. Verify that ./aidoorlock/certs contains 'root-ca.pem'
+7. Copy your device certificate, private key and public key to ./aidoorlock/certs/
+8. Open 'aws_iot_config.h' and change 'AWS_IOT_MQTT_HOST', 'AWS_IOT_CERTIFICATE_FILENAME' and 'AWS_IOT_PRIVATE_KEY_FILENAME' to values appropriate for your device and certificates.
+9. cd aidoorlock
+10. make - this command will build the mbedTLS library, the AWS IoT Device SDK and then the application 'aidoorlock'
+11. ./aidoorlock
+12. If all is well, the program should output it's own IP addresses (eth0 & wlan0) to the AWS IoT topic 'locks/ip' and speak out the words 'Doorlock is ready' from the laptop's speakers.
+
+#### Setup of USB audio dongle
 vi ~/.asoundrc and replace the contents with below 2 lines:
 pcm.!default plughw:Device
 ctl.!default plughw:Device
 
-* Lambda Functions
+#### Lambda Functions
     * Set up iotButtonDoorbellPressed.py in Singapore region, to be triggered by the AWS IoT button.
     * Set up verifyFace.py in N. Virginia region (because it needs to access Rekognition), to be triggered by image.jpg upload to S3 bucket 'raspi3locksuseast1'. This upload is done by the aidoorlock program from Rasbperry Pi.
 
-* Autostart on bootup
+#### Autostart on bootup
     * To auto run the application on Raspberry Pi bootup, create links under /etc/network/if-up.d/ and /etc/network/if-down.d/ as below:
     * sudo ln -s /home/pi/deviceSDK/linux_mqtt_openssl/sample_apps/aidoorlock/ifup.sh /etc/network/if-up.d/aidoorlock
     * sudo ln -s /home/pi/deviceSDK/linux_mqtt_openssl/sample_apps/aidoorlock/ifdown.sh /etc/network/if-down.d/aidoorlock
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
 
 ### Who do I talk to? ###
 
