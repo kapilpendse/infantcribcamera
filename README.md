@@ -8,16 +8,39 @@ This is a concept demo for a door lock equipped with AI capabilities such as voi
 
 ### Prerequisites ###
 
-* Raspberry Pi 3 with PiCam 2
-* AWS IoT SDK for C, and it's prereq openssl
-* mpg123 (sudo apt-get install mpg123)
-* Python
-* SoX (rec)
-* AWS IAM account API key and secret set up correctly on the Raspberry Pi ~/.aws/. The IAM account must have access to the following services: S3, Polly and Lex.
+#### Common prerequisites for all platforms
+* Python & AWS CLI
 * AWS default region set up to point to 'us-east-1' on the Raspberry Pi ~/.aws/. Currently Rekognition & Lex are available only in us-east-1.
+* AWS SNS configured in your AWS account for sending out SMS, with default spending limit increased to suitable value
+
+#### To run on Raspberry Pi 3 with PiCam 2
+* Raspberry Pi 3 with PiCam 2
+* Raspbian
+* raspistill (comes with Raspbian)
+* AWS IoT Device SDK for C, with mbedTLS (https://github.com/aws/aws-iot-device-sdk-embedded-C)
 * IoT device certificates
-* Configure audio defaults on the RPi to use USB audio dongle
-* AWS SNS configured for sending out SMS, with default spending limit increased to suitable value
+* mpg123 (sudo apt-get install mpg123)
+* SoX for 'rec' command (sudo apt-get install sox)
+* Configure audio defaults on the RPi to use USB audio dongle (see 'Setup of USB audio dongle' below)
+
+#### To run on Raspberry Pi 3 with USB webcam
+* Raspberry Pi 3
+* Raspbian
+* Standard USB UVC type webcam
+* fswebcam (sudo apt-get install fswebcam)
+* AWS IoT Device SDK for C, with mbedTLS (https://github.com/aws/aws-iot-device-sdk-embedded-C)
+* IoT device certificates
+* mpg123 (sudo apt-get install mpg123)
+* SoX for 'rec' command (sudo apt-get install sox)
+* Configure audio defaults on the RPi to use USB audio dongle (see 'Setup of USB audio dongle' below)
+
+#### To run on Mac OSX with built-in webcam
+* AWS IoT Device SDK for C, with mbedTLS (https://github.com/aws/aws-iot-device-sdk-embedded-C)
+* IoT device certificates
+* brew (https://brew.sh/)
+* mpg123 (sudo brew install mpg123)
+* SoX for 'rec' command (sudo brew install sox)
+* imagesnap for running on MAC OSX (sudo brew install imagesnap)
 
 ### How do I get set up? ###
 
