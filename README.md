@@ -58,19 +58,19 @@ This is a concept demo for a door lock equipped with AI capabilities such as voi
 11. ./aidoorlock
 12. If all is well, the program should output it's own IP addresses (eth0 & wlan0) to the AWS IoT topic 'locks/ip' and speak out the words 'Doorlock is ready' from the laptop's speakers.
 
-#### Setup of USB audio dongle
-vi ~/.asoundrc and replace the contents with below 2 lines:
-pcm.!default plughw:Device
-ctl.!default plughw:Device
+#### Setup of USB audio dongle on Raspberry Pi
+* vi ~/.asoundrc and replace the contents with below 2 lines:
+* pcm.!default plughw:Device
+* ctl.!default plughw:Device
 
-#### Lambda Functions
-    * Set up iotButtonDoorbellPressed.py in Singapore region, to be triggered by the AWS IoT button.
-    * Set up verifyFace.py in N. Virginia region (because it needs to access Rekognition), to be triggered by image.jpg upload to S3 bucket 'raspi3locksuseast1'. This upload is done by the aidoorlock program from Rasbperry Pi.
+#### Lambda Functions to be set up in AWS account
+* Set up iotButtonDoorbellPressed.py in Singapore region, to be triggered by the AWS IoT button.
+* Set up verifyFace.py in N. Virginia region (because it needs to access Rekognition), to be triggered by image.jpg upload to S3 bucket 'raspi3locksuseast1'. This upload is done by the aidoorlock program from Rasbperry Pi.
 
-#### Autostart on bootup
-    * To auto run the application on Raspberry Pi bootup, create links under /etc/network/if-up.d/ and /etc/network/if-down.d/ as below:
-    * sudo ln -s /home/pi/deviceSDK/linux_mqtt_openssl/sample_apps/aidoorlock/ifup.sh /etc/network/if-up.d/aidoorlock
-    * sudo ln -s /home/pi/deviceSDK/linux_mqtt_openssl/sample_apps/aidoorlock/ifdown.sh /etc/network/if-down.d/aidoorlock
+#### Autostart on bootup of Raspberry Pi
+* To auto run the application on Raspberry Pi bootup, create links under /etc/network/if-up.d/ and /etc/network/if-down.d/ as below:
+* sudo ln -s /home/pi/deviceSDK/linux_mqtt_openssl/sample_apps/aidoorlock/ifup.sh /etc/network/if-up.d/aidoorlock
+* sudo ln -s /home/pi/deviceSDK/linux_mqtt_openssl/sample_apps/aidoorlock/ifdown.sh /etc/network/if-down.d/aidoorlock
 
 ### Who do I talk to? ###
 
