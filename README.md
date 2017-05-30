@@ -10,8 +10,8 @@ Most of the setup process is automated, however some manual setup is still requi
 
 ### Common prerequisites for all platforms
 * Python & AWS CLI
-* AWS IoT Device SDK 2.1.1 (https://github.com/aws/aws-iot-device-sdk-embedded-C/archive/v2.1.1.tar.gz)
-* mbedTLS 2.1.1 library which is a dependency of the AWS IoT Device SDK 2.1.1 (https://github.com/ARMmbed/mbedtls/releases/tag/mbedtls-2.1.1)
+* [AWS IoT Device SDK 2.1.1](https://github.com/aws/aws-iot-device-sdk-embedded-C/archive/v2.1.1.tar.gz)
+* [mbedTLS 2.1.1](https://github.com/ARMmbed/mbedtls/releases/tag/mbedtls-2.1.1) library which is a dependency of the AWS IoT Device SDK 2.1.1
 * IoT device certificates, generated under your AWS account. [to be automated]
 * AWS SNS configured in your AWS account for sending out SMS, with default spending limit increased to suitable value
 
@@ -19,18 +19,18 @@ Most of the setup process is automated, however some manual setup is still requi
 * Raspberry Pi 3 with PiCam 2 or USB webcam
 * Raspbian
 * raspistill (comes with Raspbian, used only if using PiCam)
-* A USB audio dongle for connecting a speaker as well as a microphone. [Here's an example](http://www.lazada.sg/easybuy-new-pc-laptop-usb-2-3d-virtual-kx3p-71-channel-audio-soundcard-adapter-9019448.html)
+* A USB audio dongle for connecting a speaker as well as a microphone. [Here's an example.](http://www.lazada.sg/easybuy-new-pc-laptop-usb-2-3d-virtual-kx3p-71-channel-audio-soundcard-adapter-9019448.html)
 
 ### To run on Mac OSX with built-in webcam
-* brew (https://brew.sh/)
+* [brew](https://brew.sh/)
 
 ### How do I get set up? ###
 
 1. Setup cloud services by running the setup_cloud.sh script in a terminal.
-2. Download the AWS IoT Device SDK 2.1.1 source code (https://github.com/aws/aws-iot-device-sdk-embedded-C/archive/v2.1.1.tar.gz)
-3. Download and extract the mbedTLS source code inside 'aws-iot-device-sdk-embedded-C-2.1.1/external_libs/mbedTLS/' directory. Here's the download link: https://github.com/ARMmbed/mbedtls/releases/tag/mbedtls-2.1.1 After extraction, the 'mbedTLS' directory should have several files including a Makefile.
+2. Download the AWS IoT Device SDK 2.1.1 [source code](https://github.com/aws/aws-iot-device-sdk-embedded-C/archive/v2.1.1.tar.gz)
+3. Download and extract the [mbedTLS source code](https://github.com/ARMmbed/mbedtls/releases/tag/mbedtls-2.1.1) inside 'aws-iot-device-sdk-embedded-C-2.1.1/external_libs/mbedTLS/' directory. After extraction, the 'mbedTLS' directory should have several files including a Makefile.
 4. Open a terminal and go to "aws-iot-device-sdk-embedded-C-2.1.1/samples/linux"
-5. Clone 'aidoorlock' in this directory (git clone https://kapilpendse@bitbucket.org/kapilpendse/aidoorlock.git)
+5. Clone 'aidoorlock' in this directory (`git clone https://kapilpendse@bitbucket.org/kapilpendse/aidoorlock.git`)
 6. Copy your device certificate and private key to ./aidoorlock/certs/ [to be automated]
 7. In terminal, go to 'aidoorlock' directory and run 'setup_thing.sh' script.
 8. If the script completes without any errors, run ./aidoorlock
