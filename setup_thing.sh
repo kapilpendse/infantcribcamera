@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Sets up the AIDoorLock 'thing'. For the thing to work, 'cloud' side functionality must also be set up. Run 'setup_cloud.sh' to do that.
-# Usage: ./setup.sh
+# Usage: ./setup_thing.sh
 
 REKOGNITION_REGION="us-east-1"
 LEX_REGION="us-east-1"
