@@ -35,6 +35,7 @@ cd aws-iot-device-sdk-embedded-C-2.1.1/external_libs/mbedTLS
 tar xzf DOWNLOADED_FILES/mbedtls-mbedtls-2.1.1.tar.gz --strip-components 1
 cd ../../samples/linux
 git clone https://kapilpendse@bitbucket.org/kapilpendse/aidoorlock.git
+cd aidoorlock
 ./setup_cloud.sh
 ./setup_thing.sh
 ~~~~
