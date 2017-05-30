@@ -32,14 +32,16 @@ Most of the setup process is automated, however some manual setup is still requi
 4. Open a terminal and go to "aws-iot-device-sdk-embedded-C-2.1.1/samples/linux"
 5. Clone 'aidoorlock' in this directory (`git clone https://kapilpendse@bitbucket.org/kapilpendse/aidoorlock.git`)
 6. Copy your device certificate and private key to ./aidoorlock/certs/ [to be automated]
-7. In terminal, go to 'aidoorlock' directory and run 'setup_thing.sh' script.
-8. If the script completes without any errors, run ./aidoorlock
+7. In terminal, go to 'aidoorlock' directory and run the `./setup_thing.sh` script.
+8. If the script completes without any errors, run `./aidoorlock`
 9. If all is well, the program should output it's own IP addresses (eth0 & wlan0) to the AWS IoT topic 'locks/ip' and you should hear the words 'Doorlock is ready' from your computer's speakers.
 
 ### Setup of USB audio dongle on Raspberry Pi
-* vi ~/.asoundrc and replace the contents with below 2 lines:
-* pcm.!default plughw:Device
-* ctl.!default plughw:Device
+Edit ~/.asoundrc and replace its contents with following 2 lines:
+~~~~
+pcm.!default plughw:Device
+ctl.!default plughw:Device
+~~~~
 
 ### Lambda Functions to be set up in AWS account
 * Set up iotButtonDoorbellPressed.py in Singapore region, to be triggered by the AWS IoT button.
