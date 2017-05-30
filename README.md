@@ -9,9 +9,9 @@ Most of the setup process is automated, however some manual setup is still requi
 ## Prerequisites ##
 
 ### Common prerequisites for all platforms
-* Python & AWS CLI
+* Python & [AWS CLI](https://aws.amazon.com/cli/)
 * [AWS IoT Device SDK 2.1.1](https://github.com/aws/aws-iot-device-sdk-embedded-C/archive/v2.1.1.tar.gz)
-* [mbedTLS 2.1.1](https://github.com/ARMmbed/mbedtls/releases/tag/mbedtls-2.1.1) library which is a dependency of the AWS IoT Device SDK 2.1.1
+* [mbedTLS 2.1.1](https://github.com/ARMmbed/mbedtls/archive/mbedtls-2.1.1.tar.gz) library which is a dependency of the AWS IoT Device SDK 2.1.1
 * IoT device certificates, generated under your AWS account. [to be automated]
 * AWS SNS configured in your AWS account for sending out SMS, with default spending limit increased to suitable value
 
@@ -26,15 +26,20 @@ Most of the setup process is automated, however some manual setup is still requi
 
 ### How do I get set up? ###
 
-1. Setup cloud services by running the setup_cloud.sh script in a terminal.
-2. Download the AWS IoT Device SDK 2.1.1 [source code](https://github.com/aws/aws-iot-device-sdk-embedded-C/archive/v2.1.1.tar.gz)
-3. Download and extract the [mbedTLS source code](https://github.com/ARMmbed/mbedtls/releases/tag/mbedtls-2.1.1) inside 'aws-iot-device-sdk-embedded-C-2.1.1/external_libs/mbedTLS/' directory. After extraction, the 'mbedTLS' directory should have several files including a Makefile.
-4. Open a terminal and go to "aws-iot-device-sdk-embedded-C-2.1.1/samples/linux"
-5. Clone 'aidoorlock' in this directory (`git clone https://kapilpendse@bitbucket.org/kapilpendse/aidoorlock.git`)
-6. Copy your device certificate and private key to ./aidoorlock/certs/ [to be automated]
-7. In terminal, go to 'aidoorlock' directory and run the `./setup_thing.sh` script.
-8. If the script completes without any errors, run `./aidoorlock`
-9. If all is well, the program should output it's own IP addresses (eth0 & wlan0) to the AWS IoT topic 'locks/ip' and you should hear the words 'Doorlock is ready' from your computer's speakers.
+Open a bash terminal and type in the following commands:
+~~~~
+mkdir ~/ai-iot-demo
+cd ~/ai-iot-demo
+tar xzf DOWNLOADED_FILES/aws-iot-device-sdk-embedded-C-2.1.1.tar.gz
+cd aws-iot-device-sdk-embedded-C-2.1.1/external_libs/mbedTLS
+tar xzf DOWNLOADED_FILES/mbedtls-mbedtls-2.1.1.tar.gz --strip-components 1
+cd ../../samples/linux
+git clone https://kapilpendse@bitbucket.org/kapilpendse/aidoorlock.git
+./setup_cloud.sh
+./setup_thing.sh
+~~~~
+
+If there are no errors, run `./aidoorlock`, the program should output the IP addresses of your computer (eth0 & wlan0) to STDOUT and publish to the AWS IoT topic 'locks/ip' and you should hear the words 'Doorlock is ready' from your computer's speakers.
 
 ### Setup of USB audio dongle on Raspberry Pi
 Edit ~/.asoundrc and replace its contents with following 2 lines:
