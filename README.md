@@ -10,33 +10,26 @@ This is a concept demo for a door lock equipped with AI capabilities such as voi
 
 #### Common prerequisites for all platforms
 * Python & AWS CLI
-* AWS default region set up to point to 'us-east-1' on the Raspberry Pi ~/.aws/. Currently Rekognition & Lex are available only in us-east-1.
+* AWS IoT Device SDK 2.1.1 (https://github.com/aws/aws-iot-device-sdk-embedded-C/archive/v2.1.1.tar.gz)
+* mbedTLS 2.1.1 library which is a dependency of the AWS IoT Device SDK 2.1.1
+* IoT device certificates
 * AWS SNS configured in your AWS account for sending out SMS, with default spending limit increased to suitable value
 
 #### To run on Raspberry Pi 3 with PiCam 2
 * Raspberry Pi 3 with PiCam 2
 * Raspbian
 * raspistill (comes with Raspbian)
-* AWS IoT Device SDK for C, with mbedTLS (https://github.com/aws/aws-iot-device-sdk-embedded-C)
-* IoT device certificates
-* mpg123 (sudo apt-get install mpg123)
-* SoX for 'rec' command (sudo apt-get install sox)
-* Configure audio defaults on the RPi to use USB audio dongle (see 'Setup of USB audio dongle' below)
 
 #### To run on Raspberry Pi 3 with USB webcam
 * Raspberry Pi 3
 * Raspbian
 * Standard USB UVC type webcam
 * fswebcam (sudo apt-get install fswebcam)
-* AWS IoT Device SDK for C, with mbedTLS (https://github.com/aws/aws-iot-device-sdk-embedded-C)
-* IoT device certificates
 * mpg123 (sudo apt-get install mpg123)
 * SoX for 'rec' command (sudo apt-get install sox)
 * Configure audio defaults on the RPi to use USB audio dongle (see 'Setup of USB audio dongle' below)
 
 #### To run on Mac OSX with built-in webcam
-* AWS IoT Device SDK for C, with mbedTLS (https://github.com/aws/aws-iot-device-sdk-embedded-C)
-* IoT device certificates
 * brew (https://brew.sh/)
 * mpg123 (sudo brew install mpg123)
 * SoX for 'rec' command (sudo brew install sox)
@@ -46,17 +39,13 @@ This is a concept demo for a door lock equipped with AI capabilities such as voi
 
 #### Setup on MAC OSX
 1. Download the AWS IoT Device SDK 2.1.1 source code (https://github.com/aws/aws-iot-device-sdk-embedded-C/archive/v2.1.1.tar.gz)
-2. cd aws-iot-device-sdk-embedded-C-2.1.1/external_libs/mbedTLS/
-3. Download mbedTLS source code from https://github.com/ARMmbed/mbedtls/releases/tag/mbedtls-2.1.1 and extract all files in this folder. When done right, this folder should have several files including a Makefile.
-4. cd ../../samples/linux
-5. Clone 'aidoorlock' in this directory
-6. Verify that ./aidoorlock/certs contains 'root-ca.pem'
-7. Copy your device certificate, private key and public key to ./aidoorlock/certs/
-8. Open 'aws_iot_config.h' and change 'AWS_IOT_MQTT_HOST', 'AWS_IOT_CERTIFICATE_FILENAME' and 'AWS_IOT_PRIVATE_KEY_FILENAME' to values appropriate for your device and certificates.
-9. cd aidoorlock
-10. make - this command will build the mbedTLS library, the AWS IoT Device SDK and then the application 'aidoorlock'
-11. ./aidoorlock
-12. If all is well, the program should output it's own IP addresses (eth0 & wlan0) to the AWS IoT topic 'locks/ip' and speak out the words 'Doorlock is ready' from the laptop's speakers.
+2. Download and extract the mbedTLS source code inside 'aws-iot-device-sdk-embedded-C-2.1.1/external_libs/mbedTLS/' directory. Here's the download link: https://github.com/ARMmbed/mbedtls/releases/tag/mbedtls-2.1.1 After extraction, the 'mbedTLS' directory should have several files including a Makefile.
+3. Open a terminal and go to "aws-iot-device-sdk-embedded-C-2.1.1/samples/linux"
+4. Clone 'aidoorlock' in this directory (git clone https://kapilpendse@bitbucket.org/kapilpendse/aidoorlock.git)
+5. Copy your device certificate and private key to ./aidoorlock/certs/
+6. In terminal, go to 'aidoorlock' directory and run 'setup_thing.sh' script.
+7. If the script completes without any errors, run ./aidoorlock
+8. If all is well, the program should output it's own IP addresses (eth0 & wlan0) to the AWS IoT topic 'locks/ip' and you should hear the words 'Doorlock is ready' from your computer's speakers.
 
 #### Setup of USB audio dongle on Raspberry Pi
 * vi ~/.asoundrc and replace the contents with below 2 lines:

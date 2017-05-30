@@ -14,15 +14,8 @@
  */
 
 /**
- * @file subscribe_publish_sample.c
- * @brief simple MQTT publish and subscribe on the same topic
- *
- * This example takes the parameters from the aws_iot_config.h file and establishes a connection to the AWS IoT MQTT Platform.
- * It subscribes and publishes to the same topic - "sdkTest/sub"
- *
- * If all the certs are correct, you should see the messages received by the application in a loop.
- *
- * The application takes in the certificate path, host name , port and the number of times the publish should happen.
+ * @file aidoorlock.c
+ * @brief Demo program to showcase AWS IoT Device SDK, Polly, Lex & Rekognition
  *
  */
 #include <stdio.h>

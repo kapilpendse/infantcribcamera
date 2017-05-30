@@ -21,15 +21,15 @@
 #ifndef SRC_SHADOW_IOT_SHADOW_CONFIG_H_
 #define SRC_SHADOW_IOT_SHADOW_CONFIG_H_
 
-// Get from console
+// Below #defines are auto-set by setup_thing.sh
 // =================================================
-#define AWS_IOT_MQTT_HOST              "a3o09r2gh017y9.iot.ap-southeast-1.amazonaws.com" ///< Customer specific MQTT HOST. The same will be used for Thing Shadow
-#define AWS_IOT_MQTT_PORT              8883 ///< default port for MQTT/S
-#define AWS_IOT_MQTT_CLIENT_ID         "c-sdk-client-id" ///< MQTT client ID should be unique for every device
-#define AWS_IOT_MY_THING_NAME 		   "Raspi3Lock" ///< Thing Name of the Shadow this device is associated with
-#define AWS_IOT_ROOT_CA_FILENAME       "root-ca.pem" ///< Root CA file name
-#define AWS_IOT_CERTIFICATE_FILENAME   "d6751cce90-certificate.pem.crt" ///< device signed certificate file name
-#define AWS_IOT_PRIVATE_KEY_FILENAME   "d6751cce90-private.pem.key" ///< Device private key filename
+#define AWS_IOT_MQTT_HOST              "PLACEHOLDER_MQTT_HOST"
+#define AWS_IOT_MQTT_PORT              PLACEHOLDER_MQTT_PORT
+#define AWS_IOT_MQTT_CLIENT_ID         "PLACEHOLDER_MQTT_CLIENT_ID"
+#define AWS_IOT_MY_THING_NAME          "PLACEHOLDER_THING_NAME"
+#define AWS_IOT_ROOT_CA_FILENAME       "root-ca.pem"
+#define AWS_IOT_CERTIFICATE_FILENAME   "PLACEHOLDER_MQTT_CERT_FILENAME"
+#define AWS_IOT_PRIVATE_KEY_FILENAME   "PLACEHOLDER_MQTT_PRIV_KEY_FILENAME"
 // =================================================
 
 // MQTT PubSub
