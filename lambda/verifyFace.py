@@ -2,11 +2,15 @@ import sys
 import boto3
 import json
 import random
+import os
 # from botocore.errorfactory import InvalidParameterException
 
-rekognition = boto3.client('rekognition', region_name='us-east-1')
-iotData = boto3.client('iot-data', region_name='ap-southeast-1')
-guestInfoTable = boto3.resource('dynamodb').Table('LocksGuestInfo')
+# rekognition = boto3.client('rekognition', region_name='us-east-1')
+# iotData = boto3.client('iot-data', region_name='ap-southeast-1')
+rekognition = boto3.client('rekognition')
+iotData = boto3.client('iot-data')
+guestInfoTableName = os.environ['GUEST_INFO_TABLE_NAME']
+guestInfoTable = boto3.resource('dynamodb').Table(guestInfoTableName)
 
 def sendCommandToLock(command):
     iotResponse = iotData.publish(
@@ -36,7 +40,13 @@ def saveNewPasscode(passcode):
 def sendPasscodeToGuest(passcode):
     try:
         sns = boto3.client('sns')
-        phonenumber = '+6588580447'
+        # phonenumber = '+6588580447'
+        guestInfoItem = guestInfoTable.get_item(
+            Key={
+                'GuestId': 1
+            }
+        )
+        phonenumber = guestInfoItem['Item']['PhoneNumber']
         response = sns.publish(PhoneNumber = phonenumber, Message=passcode)
         print("SMS passcode sent to guest, message ID is " + response['MessageId'])
         response = guestInfoTable.update_item(

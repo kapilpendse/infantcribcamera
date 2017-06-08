@@ -1,0 +1,74 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: aidoorlock
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+# frameworkVersion: "=X.X.X"
+
+provider:
+  name: aws
+  runtime: python2.7
+
+# you can overwrite defaults here
+  stage: dev
+  region: ${file(.build/cloud_config.yml):hostRegion}
+
+# IAM role for all Lambda functions in this service
+  iamRoleStatements:
+    $ref: ./iamRoleStatements.json
+
+functions:
+  verifyFace:
+    handler: lambda/verifyFace.lambda_handler
+    environment:
+      GUEST_INFO_TABLE_NAME: ${file(.build/cloud_config.yml):guestInfoTableName}
+    events:
+      - s3:
+          bucket: ${file(.build/cloud_config.yml):bucketForImages}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: image
+  smsDeliveryHandler:
+    handler: lambda/smsDeliveryHandler.lambda_handler
+    environment:
+      GUEST_INFO_TABLE_NAME: ${file(.build/cloud_config.yml):guestInfoTableName}
+    events:
+      - cloudwatchLog: 'sns/${file(.build/cloud_config.yml):hostRegion}/${file(.build/cloud_config.yml):accountId}/DirectPublishToPhoneNumber'
+      - cloudwatchLog: 'sns/${file(.build/cloud_config.yml):hostRegion}/${file(.build/cloud_config.yml):accountId}/DirectPublishToPhoneNumber/Failure'
+
+
+resources:
+  Resources:
+    AIDoorLockGuests:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${file(.build/cloud_config.yml):guestInfoTableName}
+        AttributeDefinitions:
+          - AttributeName: GuestId
+            AttributeType: N
+        KeySchema:
+          - AttributeName: GuestId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    LambdaInvokePermission:
+      Type: "AWS::Lambda::Permission"
+      Properties:
+        FunctionName: "smsDeliveryHandler"
+        Action: "lambda:InvokeFunction"
+        Principal: "logs.${file(.build/cloud_config.yml):hostRegion}.amazonaws.com"
+        SourceAccount:
+          Ref: "AWS::AccountId"

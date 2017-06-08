@@ -3,9 +3,12 @@ import gzip
 from StringIO import StringIO
 import json
 import boto3
+import os
 
-iotData = boto3.client('iot-data', region_name='ap-southeast-1')
-guestInfoTable = boto3.resource('dynamodb').Table('LocksGuestInfo')
+# iotData = boto3.client('iot-data', region_name='ap-southeast-1')
+iotData = boto3.client('iot-data')
+guestInfoTableName = os.environ['GUEST_INFO_TABLE_NAME']
+guestInfoTable = boto3.resource('dynamodb').Table(guestInfoTableName)
 
 def sendCommandToLock(command):
     iotResponse = iotData.publish(

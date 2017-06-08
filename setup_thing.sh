@@ -3,9 +3,6 @@
 # Sets up the AIDoorLock 'thing'. For the thing to work, 'cloud' side functionality must also be set up. Run 'setup_cloud.sh' to do that.
 # Usage: ./setup_thing.sh
 
-REKOGNITION_REGION="us-east-1"
-LEX_REGION="us-east-1"
-POLLY_REGION="us-west-2"
 AWS_IOT_MQTT_HOST="yodayoda.iot.ap-southeast-1.amazonaws.com"
 AWS_IOT_MQTT_PORT="8883"
 AWS_IOT_MQTT_CLIENT_ID="ai-doorlock-$RANDOM"

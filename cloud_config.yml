@@ -1,0 +1,10 @@
+# cloud_config.yml - DO NOT EDIT
+# This is a template. Config is auto generated
+# in .serverless/cloud_config.yml by replacing placeholder values with actuals
+# from setup_cloud.sh.
+# To set configuration, change values of variables in setup_cloud.sh
+
+hostRegion: HOST_REGION
+accountId: ACCOUNT_ID
+bucketForImages: BUCKET_FOR_IMAGES
+guestInfoTableName: GUEST_INFO_TABLE_NAME
