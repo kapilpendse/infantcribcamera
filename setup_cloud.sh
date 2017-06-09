@@ -88,8 +88,7 @@ case "$1" in
 		# delete device identities
 		aws --region $HOST_REGION iot detach-thing-principal --thing-name $THING_NAME --principal `cat .build/cert_arn.txt` || { echo "Failed to detach certificate from thing." >&2; exit 1; }
 		aws --region $HOST_REGION iot detach-principal-policy --policy-name $THING_NAME"_Policy" --principal `cat .build/cert_arn.txt` || { echo "Failed to detach policy from certificate." >&2; exit 1; }
-		CERT_ID=$(cat .build/cert_art.txt | sed 's/.*cert\///')
-		echo $CERT_ID
+		CERT_ID=$(cat .build/cert_arn.txt | sed 's/.*cert\///')
 		aws --output text --region $HOST_REGION iot update-certificate --certificate-id $CERT_ID --new-status "INACTIVE" || { echo "Failed to make certificate INACTIVE." >&2; exit 1; }
 		aws --output text --region $HOST_REGION iot delete-certificate --certificate-id $CERT_ID || { echo "Failed to delete certificate." >&2; exit 1; }
 
