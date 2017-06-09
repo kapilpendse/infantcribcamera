@@ -19,6 +19,8 @@ GUEST_INFO_TABLE_NAME="aidoorlockguests"
 # A phone number to receive passcode via SMS, posing as guest
 GUEST_PHONE_NUMBER="+6588580447"
 
+THING_NAME="AIDoorLock"
+
 # CHECK PREREQUISITES
 function check_prerequisites () {
 	# Python
@@ -54,6 +56,7 @@ case "$1" in
 		sed -i -e "s/HOST_REGION/$HOST_REGION/g" .build/cloud_config.yml
 		sed -i -e "s/BUCKET_FOR_IMAGES/$BUCKET_FOR_IMAGES/g" .build/cloud_config.yml
 		sed -i -e "s/GUEST_INFO_TABLE_NAME/$GUEST_INFO_TABLE_NAME/g" .build/cloud_config.yml
+		sed -i -e "s/THING_NAME/$THING_NAME/g" .build/cloud_config.yml
 		echo "generating seed data file (.build/seed_data.json)"
 		cp seed_data.json .build/seed_data.json
 		sed -i -e "s/GUEST_PHONE_NUMBER/$GUEST_PHONE_NUMBER/g" .build/seed_data.json
@@ -67,7 +70,9 @@ case "$1" in
 		aws --region $HOST_REGION dynamodb put-item --table-name $GUEST_INFO_TABLE_NAME --item file://.build/seed_data.json  || { echo "Data initialisation failed." >&2; exit 1; }
 
 		# provision device identities
-		# TBD
+		aws --output text --region $HOST_REGION iot create-keys-and-certificate --set-as-active --certificate-pem-outfile certs/certificate.pem.crt --public-key-outfile certs/public.pem.key --private-key-outfile certs/private.pem.key --query 'certificateArn' > .build/cert_arn.txt  || { echo "Failed to provision device certificate." >&2; exit 1; }
+		aws --region $HOST_REGION iot attach-principal-policy --policy-name $THING_NAME"_Policy" --principal `cat .build/cert_arn.txt` || { echo "Failed to attach policy to certificate." >&2; exit 1; }
+		aws --region $HOST_REGION iot attach-thing-principal --thing-name $THING_NAME --principal `cat .build/cert_arn.txt` || { echo "Failed to attach certificate to thing." >&2; exit 1; }
 
 		echo "deployment completed"
 		;;
@@ -81,7 +86,12 @@ case "$1" in
 		fi
 
 		# delete device identities
-		# TBD
+		aws --region $HOST_REGION iot detach-thing-principal --thing-name $THING_NAME --principal `cat .build/cert_arn.txt` || { echo "Failed to detach certificate from thing." >&2; exit 1; }
+		aws --region $HOST_REGION iot detach-principal-policy --policy-name $THING_NAME"_Policy" --principal `cat .build/cert_arn.txt` || { echo "Failed to detach policy from certificate." >&2; exit 1; }
+		CERT_ID=$(cat .build/cert_art.txt | sed 's/.*cert\///')
+		echo $CERT_ID
+		aws --output text --region $HOST_REGION iot update-certificate --certificate-id $CERT_ID --new-status "INACTIVE" || { echo "Failed to make certificate INACTIVE." >&2; exit 1; }
+		aws --output text --region $HOST_REGION iot delete-certificate --certificate-id $CERT_ID || { echo "Failed to delete certificate." >&2; exit 1; }
 
 		# Empty the S3 bucket
 		echo "emptying the S3 bucket: $BUCKET_FOR_IMAGES"

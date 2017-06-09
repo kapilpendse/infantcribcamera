@@ -8,3 +8,4 @@ hostRegion: HOST_REGION
 accountId: ACCOUNT_ID
 bucketForImages: BUCKET_FOR_IMAGES
 guestInfoTableName: GUEST_INFO_TABLE_NAME
+thingName: THING_NAME

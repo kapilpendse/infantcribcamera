@@ -72,3 +72,22 @@ resources:
         Principal: "logs.${file(.build/cloud_config.yml):hostRegion}.amazonaws.com"
         SourceAccount:
           Ref: "AWS::AccountId"
+    AIDoorLockThing:
+      Type: "AWS::IoT::Thing"
+      Properties:
+        ThingName: "${file(.build/cloud_config.yml):thingName}"
+    AIDoorLockThingPolicy:
+      Type: "AWS::IoT::Policy"
+      Properties:
+        PolicyName: "${file(.build/cloud_config.yml):thingName}_Policy"
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            -
+              Effect: "Allow"
+              Action:
+                -
+                  "iot:*"
+              Resource:
+                -
+                  "*"
