@@ -19,7 +19,9 @@ GUEST_INFO_TABLE_NAME="aidoorlockguests"
 # A phone number to receive passcode via SMS, posing as guest
 GUEST_PHONE_NUMBER="+6588580447"
 
+# Name of the Thing
 THING_NAME="AIDoorLock"
+
 
 # CHECK PREREQUISITES
 function check_prerequisites () {
@@ -60,6 +62,8 @@ case "$1" in
 		echo "generating seed data file (.build/seed_data.json)"
 		cp seed_data.json .build/seed_data.json
 		sed -i -e "s/GUEST_PHONE_NUMBER/$GUEST_PHONE_NUMBER/g" .build/seed_data.json
+		echo $THING_NAME > .build/thing_name.txt
+		echo $HOST_REGION > .build/host_region.txt
 
 		# Deploy serverless package
 		echo "deploying serverless package to cloud"
@@ -74,7 +78,7 @@ case "$1" in
 		aws --region $HOST_REGION iot attach-principal-policy --policy-name $THING_NAME"_Policy" --principal `cat .build/cert_arn.txt` || { echo "Failed to attach policy to certificate." >&2; exit 1; }
 		aws --region $HOST_REGION iot attach-thing-principal --thing-name $THING_NAME --principal `cat .build/cert_arn.txt` || { echo "Failed to attach certificate to thing." >&2; exit 1; }
 
-		echo "deployment completed"
+		echo "cloud deployment completed, now you can run ./setup_thing.sh"
 		;;
 	teardown)
 		# Check prerequisites
@@ -103,7 +107,7 @@ case "$1" in
 		echo "deleting cloud configuration files (.build/*)"
 		rm -rf .build/
 
-		echo "end of script"
+		echo "cloud teardown completed, end of script"
 		;;
 	*)
 		echo "Usage: $0 {deploy|teardown}"

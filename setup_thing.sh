@@ -3,12 +3,14 @@
 # Sets up the AIDoorLock 'thing'. For the thing to work, 'cloud' side functionality must also be set up. Run 'setup_cloud.sh' to do that.
 # Usage: ./setup_thing.sh
 
-AWS_IOT_MQTT_HOST="yodayoda.iot.ap-southeast-1.amazonaws.com"
+# AWS_IOT_MQTT_HOST="yodayoda.iot.ap-southeast-1.amazonaws.com"
+HOST_REGION=$(cat .build/host_region.txt)
+AWS_IOT_MQTT_HOST=$(aws --region $HOST_REGION iot describe-endpoint --output text)
 AWS_IOT_MQTT_PORT="8883"
 AWS_IOT_MQTT_CLIENT_ID="ai-doorlock-$RANDOM"
-AWS_IOT_THING_NAME="AIDoorLock"
-AWS_IOT_THING_CERTIFICATE="yadayada-certificate.pem.crt"
-AWS_IOT_THING_PRIVATE_KEY="yadayada-private.pem.key"
+AWS_IOT_THING_NAME=$(cat .build/thing_name.txt)
+AWS_IOT_THING_CERTIFICATE="certificate.pem.crt"
+AWS_IOT_THING_PRIVATE_KEY="private.pem.key"
 
 ### CHECK PREREQUISITES ###
 
@@ -121,5 +123,5 @@ sed -i -e "s/PLACEHOLDER_MQTT_PRIV_KEY_FILENAME/$AWS_IOT_THING_PRIVATE_KEY/g" aw
 
 # Build aidoorlock
 echo "building aidoorlock"
-make
-echo "end of script"
+make || { echo "build failed."; >&2; exit 1; }
+echo "thing setup succeeded, you can now run ./aidoorlock"
