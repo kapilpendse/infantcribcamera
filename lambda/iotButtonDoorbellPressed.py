@@ -1,6 +1,6 @@
 import boto3
 
-iotData = boto3.client('iot-data', region_name='ap-southeast-1')
+iotData = boto3.client('iot-data')
 
 def sendCommandToLock(command):
     iotResponse = iotData.publish(
