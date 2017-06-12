@@ -81,6 +81,9 @@ This demo focuses on highlighting the ease with which it is possible to solve re
 6. If everything is setup correctly, the *aidoorlock* program should receive the message that is published by *doorbell* (via AWS IoT), and you should hear voice instructions from the speakers.
 7. Follow the voice instructions.
 
+## Teardown ##
+To teardown the demo from your AWS account, open a terminal, navigate to the *aidoorlock* project directory and run `./setup_cloud.sh teardown`. This will tear down all the cloud resources that were setup by this script, including IoT device certificates.
+
 ## Troubleshooting ##
 * If the `setup_cloud.sh` script fails during deployment with the error message `Unable to validate the following destination configurations`, do the following steps:
 	* Login to your AWS web console, go to Cloud Formation page and delete the stack named 'aidoorlock-dev'. If this fails, delete again by this time choose to retain the S3 bucket 'aidoorlock-dev-serverlessdeployment-*'. Once the stack is deleted, delete the S3 bucket manually if it still exists.
