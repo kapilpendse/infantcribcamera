@@ -16,7 +16,7 @@ BUCKET_FOR_IMAGES="aidoorlock-images"
 # Name of the DynamoDB table that is created for this demo
 GUEST_INFO_TABLE_NAME="aidoorlockguests"
 
-# A phone number to receive passcode via SMS, posing as guest
+# A phone number to receive passcode via SMS (e.g. +1231231231)
 GUEST_PHONE_NUMBER=""
 
 # Name of the Thing

@@ -3,6 +3,7 @@
 This is a concept demo for a door lock equipped with AI capabilities such as voice interaction and facial verification. It uses AWS services such as IoT, Rekognition, Polly, Lex, Lambda, S3 and SNS.
 
 There are 2 components to this demo - the 'aidoorlock' program that runs on a thing and a bunch of cloud services that runs on AWS cloud. This demo supports the following platforms as 'thing' - Raspberry Pi 3 with:
+
 * Raspbian (setup scripts don't work, WIP)
 * Debian/Ubuntu Linux (setup scripts don't work, WIP)
 * Mac with macOS Sierra
@@ -28,7 +29,9 @@ Most of the setup process is automated, however some manual setup is still requi
 
 ## Setup Instructions ##
 
-Open a bash terminal and type in the following commands:
+1. Download the AWS IoT Device SDK and mbedTLS library from the links above (common prerequisites section)
+2. Open a bash terminal and type in the following commands:
+
 ~~~~
 mkdir ~/ai-iot-demo
 cd ~/ai-iot-demo
