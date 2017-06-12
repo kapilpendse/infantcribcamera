@@ -17,7 +17,7 @@ BUCKET_FOR_IMAGES="aidoorlock-images"
 GUEST_INFO_TABLE_NAME="aidoorlockguests"
 
 # A phone number to receive passcode via SMS, posing as guest
-GUEST_PHONE_NUMBER="+6588580447"
+GUEST_PHONE_NUMBER=""
 
 # Name of the Thing
 THING_NAME="AIDoorLock"
@@ -41,6 +41,14 @@ function check_prerequisites () {
 	# SERVERLESS FRAMEWORK
 	command -v serverless --version > /dev/null 2>&1 || { echo "Serverless Framework was not detected. Aborting." >&2; exit 1; }
 	echo "serverless framework detected"
+
+	if [ -z "$GUEST_PHONE_NUMBER" ]; then
+	    echo "Please set GUEST_PHONE_NUMBER at the top of this script."
+	    exit 1
+	else
+	    echo "GUEST_PHONE_NUMBER checked"
+	fi
+
 }
 
 case "$1" in
