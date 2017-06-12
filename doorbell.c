@@ -146,6 +146,9 @@ int main(int argc, char **argv) {
 		IOT_INFO("Publish done\n");
 	}
 
+	IOT_INFO("Ding Dong\n");
+	system("mpg123 ding_dong.mp3 &");
+
 	rc = aws_iot_mqtt_disconnect(&client);
 	return rc;
 }
