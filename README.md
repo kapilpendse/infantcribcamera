@@ -57,7 +57,7 @@ ctl.!default plughw:Device
 * sudo ln -s /home/pi/deviceSDK/linux_mqtt_openssl/sample_apps/aidoorlock/ifdown.sh /etc/network/if-down.d/aidoorlock
 
 ## Demo Suggestions ##
-The easiest way to run this demo is on a Mac with macOS Sierra. This is easy, portable and you don't need to setup a Raspberry Pi with all its accessories. Simply follow the setup instructions above, run `aidoorlock` and then open "doorbell.html" in a browser.
+The easiest way to run this demo is on a Mac with macOS Sierra. This is easy, portable and you don't need to setup a Raspberry Pi with all its accessories. Simply follow the setup instructions above, run `./aidoorlock` and then run `./doorbell` in another terminal window. The `doorbell` program publishes a message to an AWS IoT topic to simulate the pressing of an AWS IoT Button (see below), and the `aidoorlock` receives the message and the magic begins.
 
 If you are feeling more adventurous, you can use an AWS IoT Button instead of the virtual doorbell (doorbell.html). You will have to configure an AWS IoT Button in your account, setup the Lambda function 'iotButtonDoorbellPressed.py', and add a rule for the button so that it invokes the 'iotButtonDoorbellPressed.py' Lambda function.
 
@@ -75,12 +75,6 @@ This demo focuses on highlighting the ease with which it is possible to solve re
 	* Login to your AWS web console, go to Cloud Formation page and delete the stack named 'aidoorlock-dev'. If this fails, delete again by this time choose to retain the S3 bucket 'aidoorlock-dev-serverlessdeployment-*'. Once the stack is deleted, delete the S3 bucket manually if it still exists.
 	* On your Raspberry Pi or computer, run the `setup_cloud.sh` script again.
 	* [This problem has been reported](https://github.com/serverless/serverless/issues/3038) by many users of the 'serverless' framework.
-* OpenSSL version issue: On macOS Sierra, if you see the following error, run `brew install openssl`:
-
-~~~
-UnsupportedTLSVersionWarning: Currently installed openssl version: OpenSSL 0.9.8zh 14 Jan 2016 does not support TLS 1.2, which is required for use of iot-data. Please use python installed with openssl version 1.0.1 or higher.
-~~~
-
 * Contact me ;)
 
 ### Who do I talk to? ###

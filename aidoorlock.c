@@ -121,7 +121,7 @@ void onStartup() {
 void cmdHandlerCapturePhoto(IoT_Publish_Message_Params *params) {
 	IOT_INFO("Capture Photo");
 	//important to add '&' at end of command so that the MQTT subscription of this program does not get blocked (and timed out)
-	system("sh `pwd`/scripts/capture.sh \"" POLLY_PROMPT_LOOK_AT_CAMERA "\" \"" POLLY_PROMPT_WAIT_A_MOMENT "\" &");
+	system("sh `pwd`/scripts/capture.sh \"" POLLY_PROMPT_LOOK_AT_CAMERA "\" \"" POLLY_PROMPT_WAIT_A_MOMENT "\" \"" AWS_HOST_REGION "\" \"" AWS_S3_BUCKET_NAME "\" &");
 }
 
 void cmdHandlerFrFailure(IoT_Publish_Message_Params *params) {

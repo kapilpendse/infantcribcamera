@@ -34,7 +34,7 @@
 #include <memory.h>
 #include <sys/time.h>
 
-#include "aws_iot_config.h"
+#include "aws_iot_config_doorbell.h"
 #include "aws_iot_log.h"
 #include "aws_iot_version.h"
 #include "aws_iot_mqtt_client_interface.h"
@@ -86,7 +86,6 @@ int main(int argc, char **argv) {
 	char clientCRT[PATH_MAX + 1];
 	char clientKey[PATH_MAX + 1];
 	char CurrentWD[PATH_MAX + 1];
-	char clientId[100];
 	char cPayload[100];
 
 	IoT_Error_t rc = FAILURE;
@@ -119,12 +118,10 @@ int main(int argc, char **argv) {
 		return rc;
 	}
 
-	memset(clientId, sizeof(clientId), sizeof(char));
-	sprintf(clientId, "%s-%s", AWS_IOT_MQTT_CLIENT_ID, "doorbell");
 	connectParams.keepAliveIntervalInSec = 10;
 	connectParams.isCleanSession = true;
 	connectParams.MQTTVersion = MQTT_3_1_1;
-	connectParams.pClientID = clientId;
+	connectParams.pClientID = AWS_IOT_MQTT_CLIENT_ID;
 	connectParams.clientIDLen = (uint16_t) strlen(AWS_IOT_MQTT_CLIENT_ID);
 	connectParams.isWillMsgPresent = false;
 

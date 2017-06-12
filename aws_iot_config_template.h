@@ -23,6 +23,8 @@
 
 // Below #defines are auto-set by setup_thing.sh
 // =================================================
+#define AWS_HOST_REGION                "PLACEHOLDER_HOST_REGION"
+#define AWS_S3_BUCKET_NAME             "PLACEHOLDER_S3_BUCKET_NAME"
 #define AWS_IOT_MQTT_HOST              "PLACEHOLDER_MQTT_HOST"
 #define AWS_IOT_MQTT_PORT              PLACEHOLDER_MQTT_PORT
 #define AWS_IOT_MQTT_CLIENT_ID         "PLACEHOLDER_MQTT_CLIENT_ID"

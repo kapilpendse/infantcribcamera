@@ -3,14 +3,19 @@
 # Sets up the AIDoorLock 'thing'. For the thing to work, 'cloud' side functionality must also be set up. Run 'setup_cloud.sh' to do that.
 # Usage: ./setup_thing.sh
 
-# AWS_IOT_MQTT_HOST="yodayoda.iot.ap-southeast-1.amazonaws.com"
 HOST_REGION=$(cat .build/host_region.txt)
+S3_BUCKET_NAME=$(cat .build/bucket_name.txt)
 AWS_IOT_MQTT_HOST=$(aws --region $HOST_REGION iot describe-endpoint --output text)
 AWS_IOT_MQTT_PORT="8883"
 AWS_IOT_MQTT_CLIENT_ID="ai-doorlock-$RANDOM"
 AWS_IOT_THING_NAME=$(cat .build/thing_name.txt)
 AWS_IOT_THING_CERTIFICATE="certificate.pem.crt"
 AWS_IOT_THING_PRIVATE_KEY="private.pem.key"
+
+AWS_IOT_MQTT_CLIENT_ID_DOORBELL="ai-doorbell-$RANDOM"
+AWS_IOT_THING_NAME_DOORBELL=$(cat .build/doorbell_thing_name.txt)
+AWS_IOT_THING_CERTIFICATE_DOORBELL="doorbell-certificate.pem.crt"
+AWS_IOT_THING_PRIVATE_KEY_DOORBELL="doorbell-private.pem.key"
 
 ### CHECK PREREQUISITES ###
 
@@ -21,32 +26,6 @@ echo "python detected"
 # AWS CLI
 command -v aws --version > /dev/null 2>&1 || { echo "AWS CLI was not detected. Aborting." >&2; exit 1; }
 echo "aws cli detected"
-
-# AWS IOT parameter configuration and files
-if [ -z "$AWS_IOT_MQTT_HOST" ]; then
-    echo "Please set AWS_IOT_MQTT_HOST at the top of this script."
-    exit 1
-else
-    echo "AWS_IOT_MQTT_HOST checked"
-fi
-if [ -z "$AWS_IOT_MQTT_CLIENT_ID" ]; then
-    echo "Please set AWS_IOT_MQTT_CLIENT_ID at the top of this script."
-    exit 1
-else
-    echo "AWS_IOT_MQTT_CLIENT_ID checked"
-fi
-if [ -z "$AWS_IOT_THING_CERTIFICATE" ]; then
-    echo "Please set AWS_IOT_THING_CERTIFICATE at the top of this script."
-    exit 1
-else
-    echo "AWS_IOT_THING_CERTIFICATE checked"
-fi
-if [ -z "$AWS_IOT_THING_PRIVATE_KEY" ]; then
-    echo "Please set AWS_IOT_THING_PRIVATE_KEY at the top of this script."
-    exit 1
-else
-    echo "AWS_IOT_THING_PRIVATE_KEY checked"
-fi
 
 # Check if this repo is cloned inside the AWS IoT Device SDK source code
 if [[ $PWD != *'aws-iot-device-sdk-embedded-C-2.1.1/samples/linux/aidoorlock' ]]; then
@@ -114,12 +93,23 @@ fi
 # Setup AWS IOT params in aws_iot_config.h
 echo "generating file with IoT settings"
 cp aws_iot_config_template.h aws_iot_config.h
+sed -i -e "s/PLACEHOLDER_HOST_REGION/$HOST_REGION/g" aws_iot_config.h
+sed -i -e "s/PLACEHOLDER_S3_BUCKET_NAME/$S3_BUCKET_NAME/g" aws_iot_config.h
 sed -i -e "s/PLACEHOLDER_MQTT_HOST/$AWS_IOT_MQTT_HOST/g" aws_iot_config.h
 sed -i -e "s/PLACEHOLDER_MQTT_PORT/$AWS_IOT_MQTT_PORT/g" aws_iot_config.h
 sed -i -e "s/PLACEHOLDER_MQTT_CLIENT_ID/$AWS_IOT_MQTT_CLIENT_ID/g" aws_iot_config.h
 sed -i -e "s/PLACEHOLDER_THING_NAME/$AWS_IOT_THING_NAME/g" aws_iot_config.h
 sed -i -e "s/PLACEHOLDER_MQTT_CERT_FILENAME/$AWS_IOT_THING_CERTIFICATE/g" aws_iot_config.h
 sed -i -e "s/PLACEHOLDER_MQTT_PRIV_KEY_FILENAME/$AWS_IOT_THING_PRIVATE_KEY/g" aws_iot_config.h
+cp aws_iot_config_template.h aws_iot_config_doorbell.h
+sed -i -e "s/PLACEHOLDER_HOST_REGION/$HOST_REGION/g" aws_iot_config_doorbell.h
+sed -i -e "s/PLACEHOLDER_S3_BUCKET_NAME/$S3_BUCKET_NAME/g" aws_iot_config_doorbell.h
+sed -i -e "s/PLACEHOLDER_MQTT_HOST/$AWS_IOT_MQTT_HOST/g" aws_iot_config_doorbell.h
+sed -i -e "s/PLACEHOLDER_MQTT_PORT/$AWS_IOT_MQTT_PORT/g" aws_iot_config_doorbell.h
+sed -i -e "s/PLACEHOLDER_MQTT_CLIENT_ID/$AWS_IOT_MQTT_CLIENT_ID_DOORBELL/g" aws_iot_config_doorbell.h
+sed -i -e "s/PLACEHOLDER_THING_NAME/$AWS_IOT_THING_NAME_DOORBELL/g" aws_iot_config_doorbell.h
+sed -i -e "s/PLACEHOLDER_MQTT_CERT_FILENAME/$AWS_IOT_THING_CERTIFICATE_DOORBELL/g" aws_iot_config_doorbell.h
+sed -i -e "s/PLACEHOLDER_MQTT_PRIV_KEY_FILENAME/$AWS_IOT_THING_PRIVATE_KEY_DOORBELL/g" aws_iot_config_doorbell.h
 
 # Build aidoorlock
 echo "building aidoorlock"

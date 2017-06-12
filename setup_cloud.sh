@@ -21,6 +21,7 @@ GUEST_PHONE_NUMBER="+6588580447"
 
 # Name of the Thing
 THING_NAME="AIDoorLock"
+DOORBELL_THING_NAME="AIDoorBell"
 
 
 # CHECK PREREQUISITES
@@ -59,11 +60,14 @@ case "$1" in
 		sed -i -e "s/BUCKET_FOR_IMAGES/$BUCKET_FOR_IMAGES/g" .build/cloud_config.yml
 		sed -i -e "s/GUEST_INFO_TABLE_NAME/$GUEST_INFO_TABLE_NAME/g" .build/cloud_config.yml
 		sed -i -e "s/THING_NAME/$THING_NAME/g" .build/cloud_config.yml
+		sed -i -e "s/DOORBELL_NAME/$DOORBELL_THING_NAME/g" .build/cloud_config.yml
 		echo "generating seed data file (.build/seed_data.json)"
 		cp seed_data.json .build/seed_data.json
 		sed -i -e "s/GUEST_PHONE_NUMBER/$GUEST_PHONE_NUMBER/g" .build/seed_data.json
 		echo $THING_NAME > .build/thing_name.txt
+		echo $DOORBELL_THING_NAME > .build/doorbell_thing_name.txt
 		echo $HOST_REGION > .build/host_region.txt
+		echo $BUCKET_FOR_IMAGES > .build/bucket_name.txt
 
 		# Deploy serverless package
 		echo "deploying serverless package to cloud"
@@ -73,10 +77,15 @@ case "$1" in
 		echo "seeding dynamodb with initial data"
 		aws --region $HOST_REGION dynamodb put-item --table-name $GUEST_INFO_TABLE_NAME --item file://.build/seed_data.json  || { echo "Data initialisation failed." >&2; exit 1; }
 
-		# provision device identities
-		aws --output text --region $HOST_REGION iot create-keys-and-certificate --set-as-active --certificate-pem-outfile certs/certificate.pem.crt --public-key-outfile certs/public.pem.key --private-key-outfile certs/private.pem.key --query 'certificateArn' > .build/cert_arn.txt  || { echo "Failed to provision device certificate." >&2; exit 1; }
-		aws --region $HOST_REGION iot attach-principal-policy --policy-name $THING_NAME"_Policy" --principal `cat .build/cert_arn.txt` || { echo "Failed to attach policy to certificate." >&2; exit 1; }
-		aws --region $HOST_REGION iot attach-thing-principal --thing-name $THING_NAME --principal `cat .build/cert_arn.txt` || { echo "Failed to attach certificate to thing." >&2; exit 1; }
+		# provision doorlock identity
+		aws --output text --region $HOST_REGION iot create-keys-and-certificate --set-as-active --certificate-pem-outfile certs/certificate.pem.crt --public-key-outfile certs/public.pem.key --private-key-outfile certs/private.pem.key --query 'certificateArn' > .build/cert_arn.txt  || { echo "Failed to provision doorlock certificate." >&2; exit 1; }
+		aws --region $HOST_REGION iot attach-principal-policy --policy-name $THING_NAME"_Policy" --principal `cat .build/cert_arn.txt` || { echo "Failed to attach policy to doorlock certificate." >&2; exit 1; }
+		aws --region $HOST_REGION iot attach-thing-principal --thing-name $THING_NAME --principal `cat .build/cert_arn.txt` || { echo "Failed to attach doorlock certificate to thing." >&2; exit 1; }
+
+		# provision doorbell identity (which simulates an AWS IoT button)
+		aws --output text --region $HOST_REGION iot create-keys-and-certificate --set-as-active --certificate-pem-outfile certs/doorbell-certificate.pem.crt --public-key-outfile certs/doorbell-public.pem.key --private-key-outfile certs/doorbell-private.pem.key --query 'certificateArn' > .build/doorbell_cert_arn.txt  || { echo "Failed to provision doorbell certificate." >&2; exit 1; }
+		aws --region $HOST_REGION iot attach-principal-policy --policy-name $DOORBELL_THING_NAME"_Policy" --principal `cat .build/doorbell_cert_arn.txt` || { echo "Failed to attach policy to doorbell certificate." >&2; exit 1; }
+		aws --region $HOST_REGION iot attach-thing-principal --thing-name $DOORBELL_THING_NAME --principal `cat .build/doorbell_cert_arn.txt` || { echo "Failed to attach doorbell certificate to thing." >&2; exit 1; }
 
 		echo "cloud deployment completed, now you can run ./setup_thing.sh"
 		;;
@@ -95,6 +104,12 @@ case "$1" in
 		CERT_ID=$(cat .build/cert_arn.txt | sed 's/.*cert\///')
 		aws --output text --region $HOST_REGION iot update-certificate --certificate-id $CERT_ID --new-status "INACTIVE" || { echo "Failed to make certificate INACTIVE." >&2; exit 1; }
 		aws --output text --region $HOST_REGION iot delete-certificate --certificate-id $CERT_ID || { echo "Failed to delete certificate." >&2; exit 1; }
+
+		aws --region $HOST_REGION iot detach-thing-principal --thing-name $DOORBELL_THING_NAME --principal `cat .build/doorbell_cert_arn.txt` || { echo "Failed to detach doorbell certificate from thing." >&2; exit 1; }
+		aws --region $HOST_REGION iot detach-principal-policy --policy-name $DOORBELL_THING_NAME"_Policy" --principal `cat .build/doorbell_cert_arn.txt` || { echo "Failed to detach policy from doorbell certificate." >&2; exit 1; }
+		DOORBELL_CERT_ID=$(cat .build/doorbell_cert_arn.txt | sed 's/.*cert\///')
+		aws --output text --region $HOST_REGION iot update-certificate --certificate-id $DOORBELL_CERT_ID --new-status "INACTIVE" || { echo "Failed to make doorbell certificate INACTIVE." >&2; exit 1; }
+		aws --output text --region $HOST_REGION iot delete-certificate --certificate-id $DOORBELL_CERT_ID || { echo "Failed to delete doorbell certificate." >&2; exit 1; }
 
 		# Empty the S3 bucket
 		echo "emptying the S3 bucket: $BUCKET_FOR_IMAGES"
