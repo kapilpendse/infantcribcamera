@@ -1,6 +1,6 @@
 # README #
 
-This is a concept demo for a door lock equipped with AI capabilities such as voice interaction and facial verification. It uses AWS services such as IoT, Rekognition, Polly, Lex, Lambda, S3 and SNS.
+This is a concept demo of a door lock equipped with AI capabilities such as voice interaction and facial verification. It uses AWS services such as IoT, Rekognition, Polly, Lex, Lambda, S3 and SNS.
 
 There are 2 components to this demo - the 'aidoorlock' program that runs on a thing and a bunch of cloud services that runs on AWS cloud. This demo supports the following platforms as 'thing' - Raspberry Pi 3 with:
 
@@ -16,6 +16,7 @@ Most of the setup process is automated, however some manual setup is still requi
 * Python & [AWS CLI](https://aws.amazon.com/cli/)
 * [AWS IoT Device SDK 2.1.1](https://github.com/aws/aws-iot-device-sdk-embedded-C/archive/v2.1.1.tar.gz)
 * [mbedTLS 2.1.1](https://github.com/ARMmbed/mbedtls/archive/mbedtls-2.1.1.tar.gz) library which is a dependency of the AWS IoT Device SDK 2.1.1
+* **make** and **gcc** for compiling the IoT programs.
 * AWS SNS configured in your AWS account for sending out SMS, with default spending limit increased to suitable value
 
 ### Prerequisites for Raspberry Pi 3
