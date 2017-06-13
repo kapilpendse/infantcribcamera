@@ -72,6 +72,7 @@ resources:
         Principal: "logs.${file(.build/cloud_config.yml):hostRegion}.amazonaws.com"
         SourceAccount:
           Ref: "AWS::AccountId"
+      DependsOn: SmsDeliveryHandlerLambdaFunction
     AIDoorLockThing:
       Type: "AWS::IoT::Thing"
       Properties:

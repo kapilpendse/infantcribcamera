@@ -91,7 +91,7 @@ To teardown the demo from your AWS account, open a terminal, navigate to the *ai
 
 ## Troubleshooting ##
 * If the `setup_cloud.sh` script fails during deployment with the error message `Unable to validate the following destination configurations`, do the following steps:
-	* Login to your AWS web console, go to Cloud Formation page and delete the stack named 'aidoorlock-dev'. If this fails, delete again by this time choose to retain the S3 bucket 'aidoorlock-dev-serverlessdeployment-*'. Once the stack is deleted, delete the S3 bucket manually if it still exists.
+	* Login to your AWS web console, go to Cloud Formation page and delete the stack named 'aidoorlock-dev'. If this fails, delete again but this time choose to retain the S3 bucket 'aidoorlock-dev-serverlessdeployment-*'. Once the stack is deleted, delete the S3 bucket manually if it still exists.
 	* On your Raspberry Pi or computer, run the `setup_cloud.sh` script again.
 	* [This problem has been reported](https://github.com/serverless/serverless/issues/3038) by many users of the 'serverless' framework.
 * If the `setup_cloud.sh` script fails with an error about failure to create S3 bucket, open the script in a text editor and change the bucket name assigned to the variable *BUCKET_FOR_IMAGES*. S3 bucket names are unique across each AWS region, and therefore someone else (e.g. me!) might have taken the default bucket name.
