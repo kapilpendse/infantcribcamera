@@ -27,6 +27,14 @@ echo "python detected"
 command -v aws --version > /dev/null 2>&1 || { echo "AWS CLI was not detected. Aborting." >&2; exit 1; }
 echo "aws cli detected"
 
+# make
+command -v make --version > /dev/null 2>&1 || { echo "'make' was not detected. Aborting." >&2; exit 1; }
+echo "'make' detected"
+
+# gcc
+command -v gcc --version > /dev/null 2>&1 || { echo "'gcc' was not detected. Aborting." >&2; exit 1; }
+echo "'gcc' detected"
+
 # Check if this repo is cloned inside the AWS IoT Device SDK source code
 if [[ $PWD != *'aws-iot-device-sdk-embedded-C-2.1.1/samples/linux/aidoorlock' ]]; then
     echo "Not inside AWS IoT Device SDK for C 2.1.1. See 'How do I get set up?' section in README."
