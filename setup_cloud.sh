@@ -112,12 +112,18 @@ case "$1" in
 		CERT_ID=$(cat .build/cert_arn.txt | sed 's/.*cert\///')
 		aws --output text --region $HOST_REGION iot update-certificate --certificate-id $CERT_ID --new-status "INACTIVE" || { echo "Failed to make certificate INACTIVE." >&2; exit 1; }
 		aws --output text --region $HOST_REGION iot delete-certificate --certificate-id $CERT_ID || { echo "Failed to delete certificate." >&2; exit 1; }
+		rm certs/certificate.pem.crt
+		rm certs/public.pem.key
+		rm certs/private.pem.key
 
 		aws --region $HOST_REGION iot detach-thing-principal --thing-name $DOORBELL_THING_NAME --principal `cat .build/doorbell_cert_arn.txt` || { echo "Failed to detach doorbell certificate from thing." >&2; exit 1; }
 		aws --region $HOST_REGION iot detach-principal-policy --policy-name $DOORBELL_THING_NAME"_Policy" --principal `cat .build/doorbell_cert_arn.txt` || { echo "Failed to detach policy from doorbell certificate." >&2; exit 1; }
 		DOORBELL_CERT_ID=$(cat .build/doorbell_cert_arn.txt | sed 's/.*cert\///')
 		aws --output text --region $HOST_REGION iot update-certificate --certificate-id $DOORBELL_CERT_ID --new-status "INACTIVE" || { echo "Failed to make doorbell certificate INACTIVE." >&2; exit 1; }
 		aws --output text --region $HOST_REGION iot delete-certificate --certificate-id $DOORBELL_CERT_ID || { echo "Failed to delete doorbell certificate." >&2; exit 1; }
+		rm certs/doorbell-certificate.pem.crt
+		rm certs/doorbell-public.pem.key
+		rm certs/doorbell-private.pem.key
 
 		# Empty the S3 bucket
 		echo "emptying the S3 bucket: $BUCKET_FOR_IMAGES"
