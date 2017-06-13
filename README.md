@@ -17,6 +17,7 @@ Most of the setup process is automated, however some manual setup is still requi
 * [AWS IoT Device SDK 2.1.1](https://github.com/aws/aws-iot-device-sdk-embedded-C/archive/v2.1.1.tar.gz)
 * [mbedTLS 2.1.1](https://github.com/ARMmbed/mbedtls/archive/mbedtls-2.1.1.tar.gz) library which is a dependency of the AWS IoT Device SDK 2.1.1
 * **make** and **gcc** for compiling the IoT programs.
+* [Node.js](https://nodejs.org/) and the [Serverless Framework](https://serverless.com/)
 * AWS SNS configured in your AWS account for sending out SMS, with default spending limit increased to suitable value
 
 ### Prerequisites for Raspberry Pi 3
