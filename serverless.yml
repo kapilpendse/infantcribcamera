@@ -32,6 +32,7 @@ provider:
 functions:
   verifyFace:
     handler: lambda/verifyFace.lambda_handler
+    name: aidoorlock-verifyFace
     environment:
       GUEST_INFO_TABLE_NAME: ${file(.build/cloud_config.yml):guestInfoTableName}
     events:
@@ -42,11 +43,14 @@ functions:
             - prefix: image
   smsDeliveryHandler:
     handler: lambda/smsDeliveryHandler.lambda_handler
+    name: aidoorlock-smsDeliveryHandler
     environment:
       GUEST_INFO_TABLE_NAME: ${file(.build/cloud_config.yml):guestInfoTableName}
     events:
-      - cloudwatchLog: 'sns/${file(.build/cloud_config.yml):hostRegion}/${file(.build/cloud_config.yml):accountId}/DirectPublishToPhoneNumber'
-      - cloudwatchLog: 'sns/${file(.build/cloud_config.yml):hostRegion}/${file(.build/cloud_config.yml):accountId}/DirectPublishToPhoneNumber/Failure'
+      - cloudwatchLog: 'DirectPublishToPhoneNumber'
+      - cloudwatchLog: 'DirectPublishToPhoneNumber/Failure'
+      # - cloudwatchLog: 'sns/${file(.build/cloud_config.yml):hostRegion}/${file(.build/cloud_config.yml):accountId}/DirectPublishToPhoneNumber'
+      # - cloudwatchLog: 'sns/${file(.build/cloud_config.yml):hostRegion}/${file(.build/cloud_config.yml):accountId}/DirectPublishToPhoneNumber/Failure'
 
 
 resources:
@@ -67,12 +71,22 @@ resources:
     LambdaInvokePermission:
       Type: "AWS::Lambda::Permission"
       Properties:
-        FunctionName: "smsDeliveryHandler"
+        FunctionName: "aidoorlock-smsDeliveryHandler"
         Action: "lambda:InvokeFunction"
         Principal: "logs.${file(.build/cloud_config.yml):hostRegion}.amazonaws.com"
         SourceAccount:
           Ref: "AWS::AccountId"
       DependsOn: SmsDeliveryHandlerLambdaFunction
+    AIDoorLockLogGroup:
+      Type: "AWS::Logs::LogGroup"
+      Properties:
+        LogGroupName: DirectPublishToPhoneNumber
+        RetentionInDays: 14
+    AIDoorLockFailureLogGroup:
+      Type: "AWS::Logs::LogGroup"
+      Properties:
+        LogGroupName: DirectPublishToPhoneNumber/Failure
+        RetentionInDays: 14
     AIDoorLockThing:
       Type: "AWS::IoT::Thing"
       Properties:

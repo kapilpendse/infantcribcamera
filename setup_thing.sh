@@ -36,7 +36,7 @@ command -v gcc --version > /dev/null 2>&1 || { echo "'gcc' was not detected. Abo
 echo "'gcc' detected"
 
 # Check if this repo is cloned inside the AWS IoT Device SDK source code
-if [[ $PWD != *'aws-iot-device-sdk-embedded-C-2.1.1/samples/linux/aidoorlock' ]]; then
+if [[ $PWD != *'aws-iot-device-sdk-embedded-C-2.1.1/samples/linux/AIDoorLock' ]]; then
     echo "Not inside AWS IoT Device SDK for C 2.1.1. See 'How do I get set up?' section in README."
     exit 1
 else
