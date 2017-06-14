@@ -37,13 +37,13 @@ Most of the setup process is automated, however some manual setup is still requi
 ~~~~
 mkdir ~/ai-iot-demo
 cd ~/ai-iot-demo
-tar xzf DOWNLOADED_FILES/aws-iot-device-sdk-embedded-C-2.1.1.tar.gz
+tar xzf ~/Downloads/aws-iot-device-sdk-embedded-C-2.1.1.tar.gz # Change ~/Downloads to the path where you have downloaded the AWS Device SDK to
 cd aws-iot-device-sdk-embedded-C-2.1.1/external_libs/mbedTLS
-tar xzf DOWNLOADED_FILES/mbedtls-mbedtls-2.1.1.tar.gz --strip-components 1
+tar xzf ~/Downloads/mbedtls-mbedtls-2.1.1.tar.gz --strip-components 1  # Change ~/Downloads to the path where you have downloaded the mbedTLS library to
 cd ../../samples/linux
-git clone https://kapilpendse@bitbucket.org/kapilpendse/aidoorlock.git
-cd aidoorlock
-vi setup_cloud.sh # Set HOST_REGION, BUCKET_FOR_IMAGES and GUEST_PHONE_NUMBER to your desired values. You can use any text editor.
+git clone ssh://git.amazon.com/pkg/AIDoorLock # Code is hosted on Amazon's internal code.amazon.com; you will be asked for your Amazon account password.
+cd AIDoorLock
+vi setup_cloud.sh # Set HOST_REGION, BUCKET_FOR_IMAGES and GUEST_PHONE_NUMBER to your desired values. HOST_REGION must be set to the one that has Rekognition, Polly and Lex. Leave default value us-east-1 if you don't care where the demo runs. You can use any text editor.
 ./setup_cloud.sh deploy
 ./setup_thing.sh
 ~~~~
