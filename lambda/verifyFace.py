@@ -40,7 +40,6 @@ def saveNewPasscode(passcode):
 def sendPasscodeToGuest(passcode):
     try:
         sns = boto3.client('sns')
-        # phonenumber = '+6588580447'
         guestInfoItem = guestInfoTable.get_item(
             Key={
                 'GuestId': 1

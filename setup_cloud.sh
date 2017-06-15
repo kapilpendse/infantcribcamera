@@ -10,14 +10,16 @@
 # are available in the region of your choice: Polly, Lex, Rekognition, IoT, Lambda, S3, SNS, CloudWatch and DynamoDB
 HOST_REGION="us-east-1"
 
-# Give a name to the S3 bucket which will be created. S3 bucket name rules apply.
+# Give a name to the S3 bucket which will be created.
+# S3 bucket name rules apply.
+# Your IAM username will be automatically prepended to whatever you set here.
 BUCKET_FOR_IMAGES="aidoorlock-images"
 
 # Name of the DynamoDB table that is created for this demo
 GUEST_INFO_TABLE_NAME="aidoorlockguests"
 
 # A phone number to receive passcode via SMS (e.g. +1231231231)
-GUEST_PHONE_NUMBER=""
+GUEST_PHONE_NUMBER="+6588580447"
 
 # Name of the Thing
 THING_NAME="AIDoorLock"
@@ -51,10 +53,67 @@ function check_prerequisites () {
 
 }
 
+# CREATE LEX BOT
+function create_lex_bot() {
+	echo "checking if service linked role for Lex already exists"
+	LEX_SERVICE_ROLE=$(aws iam get-role --role-name AWSServiceRoleForLexBots --output text --query 'Role.RoleId')
+	if [ -z "$LEX_SERVICE_ROLE" ]; then
+		echo "no, creating one"
+	    aws iam create-service-linked-role --aws-service-name lex.amazonaws.com
+	else
+		echo "yes, 'AWSServiceRoleForLexBots' exists"
+	fi
+	echo "creating intent"
+	aws --region $HOST_REGION lex-models put-intent --name RequestForEchoIntent --cli-input-json file://lex/RequestForEchoIntent.json
+	echo "getting intent's checksum"
+	LEX_INTENT_CHECKSUM=$(aws --region $HOST_REGION lex-models get-intent --name RequestForEchoIntent --intent-version "\$LATEST" --output text --query 'checksum')
+	echo "publishing intent version for checksum $LEX_INTENT_CHECKSUM"
+	LEX_INTENT_VERSION=$(aws --region $HOST_REGION lex-models create-intent-version --name RequestForEchoIntent --checksum "$LEX_INTENT_CHECKSUM" --output text --query 'version')
+	echo "generating lex bot json file"
+	cp lex/AIDoorLockEchoBot_template.json lex/AIDoorLockEchoBot.json
+	sed -i -e "s/LEX_INTENT_VERSION/$LEX_INTENT_VERSION/g" lex/AIDoorLockEchoBot.json
+	echo "creating lex bot"
+	LEX_BOT_STATUS=$(aws --region $HOST_REGION lex-models put-bot --name AIDoorLockEchoBot --cli-input-json file://lex/AIDoorLockEchoBot.json --output text --query 'status')
+	while [ "$LEX_BOT_STATUS" != "READY" ]; do
+		echo "checking lex bot status: $LEX_BOT_STATUS, please wait"
+		sleep 2
+		LEX_BOT_STATUS=$(aws --region $HOST_REGION lex-models get-bot --name AIDoorLockEchoBot --version-or-alias "\$LATEST" --output text --query 'status')
+	done
+	echo "checking lex bot status: $LEX_BOT_STATUS"
+	echo "lex bot created, getting checksum"
+	LEX_BOT_CHECKSUM=$(aws --region $HOST_REGION lex-models get-bot --name AIDoorLockEchoBot --version-or-alias "\$LATEST" --output text --query 'checksum')
+	echo "publishing lex bot for checksum $LEX_BOT_CHECKSUM"
+	LEX_BOT_VERSION=$(aws --region $HOST_REGION lex-models create-bot-version --name AIDoorLockEchoBot --checksum "$LEX_BOT_CHECKSUM" --output text --query 'version')
+	echo "checking lex bot status"
+	LEX_BOT_STATUS=$(aws --region $HOST_REGION lex-models get-bot --name AIDoorLockEchoBot --version-or-alias "$LEX_BOT_VERSION" --output text --query 'status')
+	while [ "$LEX_BOT_STATUS" != "READY" ]; do
+		echo "checking lex bot status: $LEX_BOT_STATUS, please wait"
+		sleep 2
+		LEX_BOT_STATUS=$(aws --region $HOST_REGION lex-models get-bot --name AIDoorLockEchoBot --version-or-alias "$LEX_BOT_VERSION" --output text --query 'status')
+	done
+	echo "checking lex bot status: $LEX_BOT_STATUS"
+	aws --region $HOST_REGION lex-models put-bot-alias --name Dev --bot-name AIDoorLockEchoBot --bot-version $LEX_BOT_VERSION
+	echo "Lex bot 'AIDoorLockEchoBot' published with alias 'Dev'"
+}
+
+# DELETE LEX BOT
+function delete_lex_bot() {
+	echo "deleting bot alias"
+	aws --region $HOST_REGION lex-models delete-bot-alias --name Dev --bot-name AIDoorLockEchoBot
+	echo "deleting bot"
+	aws --region $HOST_REGION lex-models delete-bot --name AIDoorLockEchoBot
+	sleep 5
+	echo "deleting intent"
+	aws --region $HOST_REGION lex-models delete-intent --name RequestForEchoIntent
+}
+
 case "$1" in
 	deploy)
 		# Check prerequisites
 		check_prerequisites
+
+		BUCKET_FOR_IMAGES=$(aws --output text iam get-user --query 'User.UserName')"-"$BUCKET_FOR_IMAGES
+		echo "A bucket with the name '$BUCKET_FOR_IMAGES' will be created. Please upload 'enrolled_guest.jpg' to this bucket."
 
 		# Generate configuration file for serverless
 		if [ ! -d ".build" ]; then
@@ -95,6 +154,9 @@ case "$1" in
 		aws --region $HOST_REGION iot attach-principal-policy --policy-name $DOORBELL_THING_NAME"_Policy" --principal `cat .build/doorbell_cert_arn.txt` || { echo "Failed to attach policy to doorbell certificate." >&2; exit 1; }
 		aws --region $HOST_REGION iot attach-thing-principal --thing-name $DOORBELL_THING_NAME --principal `cat .build/doorbell_cert_arn.txt` || { echo "Failed to attach doorbell certificate to thing." >&2; exit 1; }
 
+		# create lex echo bot
+		create_lex_bot
+
 		echo "cloud deployment completed, now you can run ./setup_thing.sh"
 		;;
 	teardown)
@@ -106,7 +168,11 @@ case "$1" in
 			echo "Config not found. Aborting."
 		fi
 
+		# delete lex echo bot
+		delete_lex_bot
+
 		# delete device identities
+		echo "deleting device identities"
 		aws --region $HOST_REGION iot detach-thing-principal --thing-name $THING_NAME --principal `cat .build/cert_arn.txt` || { echo "Failed to detach certificate from thing." >&2; exit 1; }
 		aws --region $HOST_REGION iot detach-principal-policy --policy-name $THING_NAME"_Policy" --principal `cat .build/cert_arn.txt` || { echo "Failed to detach policy from certificate." >&2; exit 1; }
 		CERT_ID=$(cat .build/cert_arn.txt | sed 's/.*cert\///')

@@ -47,10 +47,10 @@ functions:
     environment:
       GUEST_INFO_TABLE_NAME: ${file(.build/cloud_config.yml):guestInfoTableName}
     events:
-      - cloudwatchLog: 'DirectPublishToPhoneNumber'
-      - cloudwatchLog: 'DirectPublishToPhoneNumber/Failure'
-      # - cloudwatchLog: 'sns/${file(.build/cloud_config.yml):hostRegion}/${file(.build/cloud_config.yml):accountId}/DirectPublishToPhoneNumber'
-      # - cloudwatchLog: 'sns/${file(.build/cloud_config.yml):hostRegion}/${file(.build/cloud_config.yml):accountId}/DirectPublishToPhoneNumber/Failure'
+      # - cloudwatchLog: 'DirectPublishToPhoneNumber'
+      # - cloudwatchLog: 'DirectPublishToPhoneNumber/Failure'
+      - cloudwatchLog: 'sns/${file(.build/cloud_config.yml):hostRegion}/${file(.build/cloud_config.yml):accountId}/DirectPublishToPhoneNumber'
+      - cloudwatchLog: 'sns/${file(.build/cloud_config.yml):hostRegion}/${file(.build/cloud_config.yml):accountId}/DirectPublishToPhoneNumber/Failure'
 
 
 resources:
@@ -80,12 +80,12 @@ resources:
     AIDoorLockLogGroup:
       Type: "AWS::Logs::LogGroup"
       Properties:
-        LogGroupName: DirectPublishToPhoneNumber
+        LogGroupName: 'sns/${file(.build/cloud_config.yml):hostRegion}/${file(.build/cloud_config.yml):accountId}/DirectPublishToPhoneNumber'
         RetentionInDays: 14
     AIDoorLockFailureLogGroup:
       Type: "AWS::Logs::LogGroup"
       Properties:
-        LogGroupName: DirectPublishToPhoneNumber/Failure
+        LogGroupName: 'sns/${file(.build/cloud_config.yml):hostRegion}/${file(.build/cloud_config.yml):accountId}/DirectPublishToPhoneNumber/Failure'
         RetentionInDays: 14
     AIDoorLockThing:
       Type: "AWS::IoT::Thing"

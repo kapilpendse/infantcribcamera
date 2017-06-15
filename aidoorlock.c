@@ -142,14 +142,14 @@ void cmdHandlerAskSecret(IoT_Publish_Message_Params *params) {
 	char command[1000];
 	bzero(command, sizeof(command));
 	sprintf(command,
-		"%s %s %s %s %s",
+		"%s %s %s %s %s %s",
 		"sh `pwd`/scripts/passcode.sh ",
 		passcode,
 		" \"" POLLY_PROMPT_ASK_SECRET "\"",
 		" \"" POLLY_PROMPT_ALLOW_ACCESS "\"",
-		" \"" POLLY_PROMPT_DENY_ACCESS "\" &");
+		" \"" POLLY_PROMPT_DENY_ACCESS "\"",
+		" \"" AWS_HOST_REGION "\" &");
 	system(command);
-	//system("sh `pwd`/scripts/passcode.sh \"" POLLY_PROMPT_ASK_SECRET "\" &");
 }
 
 void cmdHandlerAllowAccess(IoT_Publish_Message_Params *params) {
