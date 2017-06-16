@@ -19,7 +19,7 @@ BUCKET_FOR_IMAGES="aidoorlock-images"
 GUEST_INFO_TABLE_NAME="aidoorlockguests"
 
 # A phone number to receive passcode via SMS (e.g. +1231231231)
-GUEST_PHONE_NUMBER="+6588580447"
+GUEST_PHONE_NUMBER=""
 
 # Name of the Thing
 THING_NAME="AIDoorLock"
