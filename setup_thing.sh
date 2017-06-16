@@ -122,4 +122,7 @@ sed -i -e "s/PLACEHOLDER_MQTT_PRIV_KEY_FILENAME/$AWS_IOT_THING_PRIVATE_KEY_DOORB
 # Build aidoorlock
 echo "building aidoorlock"
 make || { echo "build failed."; >&2; exit 1; }
-echo "thing setup succeeded, you can now run ./aidoorlock"
+echo "thing setup succeeded, upload a picture of the expected guest into the S3 bucket named '$S3_BUCKET_NAME', and then run ./aidoorlock"
+echo "wait for it to annouce that it is ready (unmute your speakers!), and then in another terminal window, in the same folder, run ./doorbell."
+echo "you should hear ding dong of a door bell, and then follow the instructions that the aidoorlock program speaks out"
+echo "happy demoing!"
