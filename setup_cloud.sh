@@ -146,6 +146,8 @@ case "$1" in
 		echo "seeding dynamodb with initial data"
 		aws --region $HOST_REGION dynamodb put-item --table-name $GUEST_INFO_TABLE_NAME --item file://.build/seed_data.json  || { echo "Data initialisation failed." >&2; exit 1; }
 
+		echo "provisioning IoT device identities"
+
 		# provision doorlock identity
 		aws --output text --region $HOST_REGION iot create-keys-and-certificate --set-as-active --certificate-pem-outfile certs/certificate.pem.crt --public-key-outfile certs/public.pem.key --private-key-outfile certs/private.pem.key --query 'certificateArn' > .build/cert_arn.txt  || { echo "Failed to provision doorlock certificate." >&2; exit 1; }
 		aws --region $HOST_REGION iot attach-principal-policy --policy-name $THING_NAME"_Policy" --principal `cat .build/cert_arn.txt` || { echo "Failed to attach policy to doorlock certificate." >&2; exit 1; }
@@ -157,7 +159,14 @@ case "$1" in
 		aws --region $HOST_REGION iot attach-thing-principal --thing-name $DOORBELL_THING_NAME --principal `cat .build/doorbell_cert_arn.txt` || { echo "Failed to attach doorbell certificate to thing." >&2; exit 1; }
 
 		# create lex echo bot
+		echo "setting up Lex Bot"
 		create_lex_bot
+
+		# configure SNS for SMS
+		echo "configuring SNS for sending transactional SMS"
+		cp sns/sms-attributes-template.json .build/sms-attributes.json
+		sed -i -e "s/ACCOUNT_ID/$ACCOUNT_ID/g" .build/sms-attributes.json
+		aws --region $HOST_REGION sns set-sms-attributes --cli-input-json file://.build/sms-attributes.json
 
 		echo "cloud deployment completed, now you can run ./setup_thing.sh"
 		;;

@@ -1,0 +1,7 @@
+{
+    "attributes": {
+        "DefaultSMSType": "Transactional", 
+        "DefaultSenderID": "AiDoorLock", 
+        "DeliveryStatusIAMRole": "arn:aws:iam::ACCOUNT_ID:role/SNSSuccessFeedback"
+    }
+}

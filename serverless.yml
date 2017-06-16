@@ -125,3 +125,32 @@ resources:
               Resource:
                 -
                   "*"
+    SNSSuccessFeedback:
+      Type: "AWS::IAM::Role"
+      Properties:
+        RoleName: "SNSSuccessFeedback"
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            -
+              Effect: "Allow"
+              Principal:
+                Service:
+                  - "sns.amazonaws.com"
+              Action:
+                - "sts:AssumeRole"
+        Policies:
+          -
+            PolicyName: "SNSSuccessFeedbackInlinePolicy"
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                -
+                  Effect: "Allow"
+                  Action:
+                    - "logs:CreateLogGroup"
+                    - "logs:CreateLogStream"
+                    - "logs:PutLogEvents"
+                    - "logs:PutMetricFilter"
+                    - "logs:PutRetentionPolicy"
+                  Resource: "*"
