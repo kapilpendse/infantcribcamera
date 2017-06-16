@@ -107,12 +107,14 @@ function delete_lex_bot() {
 	aws --region $HOST_REGION lex-models delete-intent --name RequestForEchoIntent
 }
 
+# prepend IAM username to the S3 bucket name
+BUCKET_FOR_IMAGES=$(aws --output text iam get-user --query 'User.UserName')"-"$BUCKET_FOR_IMAGES
+
 case "$1" in
 	deploy)
 		# Check prerequisites
 		check_prerequisites
 
-		BUCKET_FOR_IMAGES=$(aws --output text iam get-user --query 'User.UserName')"-"$BUCKET_FOR_IMAGES
 		echo "A bucket with the name '$BUCKET_FOR_IMAGES' will be created. Please upload 'enrolled_guest.jpg' to this bucket."
 
 		# Generate configuration file for serverless
