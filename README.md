@@ -13,7 +13,8 @@ Most of the setup process is automated, however some manual setup is still requi
 ## Prerequisites ##
 
 ### Common prerequisites for all platforms
-* Python & [AWS CLI](https://aws.amazon.com/cli/)
+* [Python 2.7](https://www.python.org/download/releases/2.7/)
+* [AWS CLI version >=1.11.102](https://aws.amazon.com/cli/) *This is important because earlier versions of AWS CLI do not support Lex bot deployment.*
 * [AWS IoT Device SDK 2.1.1](https://github.com/aws/aws-iot-device-sdk-embedded-C/archive/v2.1.1.tar.gz)
 * [mbedTLS 2.1.1](https://github.com/ARMmbed/mbedtls/archive/mbedtls-2.1.1.tar.gz) library which is a dependency of the AWS IoT Device SDK 2.1.1
 * **make** and **gcc** for compiling the IoT programs.
