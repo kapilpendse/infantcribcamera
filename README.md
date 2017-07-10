@@ -81,7 +81,7 @@ This demo focuses on highlighting the ease with which it is possible to solve re
 ## Demo Runbook ##
 1. Login to AWS console and navigate to the S3 Management Console.
 2. The `setup_cloud.sh` script creates a bucket where the `aidoorlock` program uploads captured photos for face verification. Name of this bucket can be found at the top of the `setup_cloud.sh` script (*BUCKET_FOR_IMAGES*). Open this bucket in the S3 Management Console.
-3. Upload a photo of yourself (or the expected guest) with the file name *enrolled_guest.jpg*. It must be a full frontal mugshot with the face clearly visible. Don't use photos that have multiple faces.
+3. Upload a photo of yourself (or the expected guest) with the file name `enrolled_guest.jpg`. It must be a full frontal mugshot with the face clearly visible. Don't use photos that have multiple faces.
 4. Open a terminal window, navigate to the *aidoorlock* project directory, and run the door lock program like so: `./aidoorlock`. Confirm that you see the program print out the local IP addresses (eth0 and wlan0). You should also hear the words 'Doorlock is ready' from the speakers.
 5. Open another terminal window, navigate to the *aidoorlock* project directory, and run the door bell program like so: `./doorbell`.
 6. If everything is setup correctly, the *aidoorlock* program should receive the message that is published by *doorbell* (via AWS IoT), and you should hear voice instructions from the speakers.
