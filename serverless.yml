@@ -125,10 +125,10 @@ resources:
               Resource:
                 -
                   "*"
-    SNSSuccessFeedback:
+    AIDoorLockSNSSuccessFeedback:
       Type: "AWS::IAM::Role"
       Properties:
-        RoleName: "SNSSuccessFeedback"
+        RoleName: "AIDoorLockSNSSuccessFeedback"
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -141,7 +141,7 @@ resources:
                 - "sts:AssumeRole"
         Policies:
           -
-            PolicyName: "SNSSuccessFeedbackInlinePolicy"
+            PolicyName: "AIDoorLockSNSSuccessFeedbackInlinePolicy"
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
