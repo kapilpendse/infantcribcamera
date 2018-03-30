@@ -83,6 +83,9 @@ void onStartup() {
 	IOT_INFO("Announcing startup");
 	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_READY "\" &");
 
+	//spin off fswatch to monitor changes in 'camera_captures' folder
+	system("sh `pwd`/scripts/watch_camera_captures.sh \"" AWS_HOST_REGION "\" \"" AWS_S3_BUCKET_NAME "\" &");
+
 	//publish own IP address to topic "locks/ip"
 	IoT_Error_t rc = SUCCESS;
 	char cPayload[100];
@@ -96,7 +99,7 @@ void onStartup() {
 	paramsQOS1.isRetained = 0;
 	sprintf(cPayload, "wlan0 IP address is %s", wlan0_ip);
 	paramsQOS1.payloadLen = strlen(cPayload);
-	rc = aws_iot_mqtt_publish(&client, TOPIC_LOCKS_IP, strlen(TOPIC_LOCKS_IP), &paramsQOS1);
+	rc = aws_iot_mqtt_publish(&client, TOPIC_IP, strlen(TOPIC_IP), &paramsQOS1);
 	if (rc == MQTT_REQUEST_TIMEOUT_ERROR) {
 		IOT_WARN("QOS1 publish ack not received.\n");
 		rc = SUCCESS;
@@ -110,7 +113,7 @@ void onStartup() {
 	paramsQOS1.isRetained = 0;
 	sprintf(cPayload, "eth0 IP address is %s", eth0_ip);
 	paramsQOS1.payloadLen = strlen(cPayload);
-	rc = aws_iot_mqtt_publish(&client, TOPIC_LOCKS_IP, strlen(TOPIC_LOCKS_IP), &paramsQOS1);
+	rc = aws_iot_mqtt_publish(&client, TOPIC_IP, strlen(TOPIC_IP), &paramsQOS1);
 	if (rc == MQTT_REQUEST_TIMEOUT_ERROR) {
 		IOT_WARN("QOS1 publish ack not received.\n");
 		rc = SUCCESS;
@@ -118,54 +121,61 @@ void onStartup() {
 
 }
 
-void cmdHandlerCapturePhoto(IoT_Publish_Message_Params *params) {
-	IOT_INFO("Capture Photo");
+void cmdHandlerRingAlarm(IoT_Publish_Message_Params *params) {
+	IOT_INFO("Ring Alarm");
 	//important to add '&' at end of command so that the MQTT subscription of this program does not get blocked (and timed out)
-	system("sh `pwd`/scripts/capture.sh \"" POLLY_PROMPT_LOOK_AT_CAMERA "\" \"" POLLY_PROMPT_WAIT_A_MOMENT "\" \"" AWS_HOST_REGION "\" \"" AWS_S3_BUCKET_NAME "\" &");
+	system("mpg123 alarm.mp3 &");
+	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_ATTENTION "\" &");
 }
 
-void cmdHandlerFrFailure(IoT_Publish_Message_Params *params) {
-	IOT_INFO("Facial Recognition Failed");
-	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_FR_FAILURE "\" &");
-}
+// void cmdHandlerCapturePhoto(IoT_Publish_Message_Params *params) {
+// 	IOT_INFO("Capture Photo");
+// 	//important to add '&' at end of command so that the MQTT subscription of this program does not get blocked (and timed out)
+// 	system("sh `pwd`/scripts/capture.sh \"" POLLY_PROMPT_LOOK_AT_CAMERA "\" \"" POLLY_PROMPT_WAIT_A_MOMENT "\" \"" AWS_HOST_REGION "\" \"" AWS_S3_BUCKET_NAME "\" &");
+// }
 
-void cmdHandlerUpdatePasscode(IoT_Publish_Message_Params *params) {
-	IOT_INFO("Update Passcode");
-	char *pPasscode = ((char*)params->payload)+strlen(CMD_UPDATE_PASSCODE)+1;
-	strncpy(passcode, pPasscode, 4);
-	IOT_INFO("New passcode is %s", passcode);
-	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_SENDING_SMS "\" &");
-}
+// void cmdHandlerFrFailure(IoT_Publish_Message_Params *params) {
+// 	IOT_INFO("Facial Recognition Failed");
+// 	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_FR_FAILURE "\" &");
+// }
 
-void cmdHandlerAskSecret(IoT_Publish_Message_Params *params) {
-	IOT_INFO("Ask Secret");
-	char command[1000];
-	bzero(command, sizeof(command));
-	sprintf(command,
-		"%s %s %s %s %s %s",
-		"sh `pwd`/scripts/passcode.sh ",
-		passcode,
-		" \"" POLLY_PROMPT_ASK_SECRET "\"",
-		" \"" POLLY_PROMPT_ALLOW_ACCESS "\"",
-		" \"" POLLY_PROMPT_DENY_ACCESS "\"",
-		" \"" AWS_HOST_REGION "\" &");
-	system(command);
-}
+// void cmdHandlerUpdatePasscode(IoT_Publish_Message_Params *params) {
+// 	IOT_INFO("Update Passcode");
+// 	char *pPasscode = ((char*)params->payload)+strlen(CMD_UPDATE_PASSCODE)+1;
+// 	strncpy(passcode, pPasscode, 4);
+// 	IOT_INFO("New passcode is %s", passcode);
+// 	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_SENDING_SMS "\" &");
+// }
 
-void cmdHandlerAllowAccess(IoT_Publish_Message_Params *params) {
-	IOT_INFO("Allow Access");
-	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_ALLOW_ACCESS "\" &");
-}
+// void cmdHandlerAskSecret(IoT_Publish_Message_Params *params) {
+// 	IOT_INFO("Ask Secret");
+// 	char command[1000];
+// 	bzero(command, sizeof(command));
+// 	sprintf(command,
+// 		"%s %s %s %s %s %s",
+// 		"sh `pwd`/scripts/passcode.sh ",
+// 		passcode,
+// 		" \"" POLLY_PROMPT_ASK_SECRET "\"",
+// 		" \"" POLLY_PROMPT_ALLOW_ACCESS "\"",
+// 		" \"" POLLY_PROMPT_DENY_ACCESS "\"",
+// 		" \"" AWS_HOST_REGION "\" &");
+// 	system(command);
+// }
 
-void cmdHandlerDenyAccess(IoT_Publish_Message_Params *params) {
-	IOT_INFO("Deny Access");
-	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_DENY_ACCESS "\" &");
-}
+// void cmdHandlerAllowAccess(IoT_Publish_Message_Params *params) {
+// 	IOT_INFO("Allow Access");
+// 	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_ALLOW_ACCESS "\" &");
+// }
 
-void cmdHandlerSMSFailed(IoT_Publish_Message_Params *params) {
-	IOT_INFO("SMS Failed");
-	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_SMS_FAILED "\" &");
-}
+// void cmdHandlerDenyAccess(IoT_Publish_Message_Params *params) {
+// 	IOT_INFO("Deny Access");
+// 	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_DENY_ACCESS "\" &");
+// }
+
+// void cmdHandlerSMSFailed(IoT_Publish_Message_Params *params) {
+// 	IOT_INFO("SMS Failed");
+// 	system("python `pwd`/scripts/speak.py \"" POLLY_PROMPT_SMS_FAILED "\" &");
+// }
 
 void iot_subscribe_callback_handler(AWS_IoT_Client *pClient, char *topicName, uint16_t topicNameLen,
 									IoT_Publish_Message_Params *params, void *pData) {
@@ -173,27 +183,32 @@ void iot_subscribe_callback_handler(AWS_IoT_Client *pClient, char *topicName, ui
 	IOT_UNUSED(pClient);
 	IOT_INFO("Subscribe callback");
 	IOT_INFO("%.*s\t%.*s", topicNameLen, topicName, (int) params->payloadLen, params->payload);
-	if(strncmp((char*)params->payload, CMD_CAPTURE_PHOTO, (int)params->payloadLen) == 0) {
-		cmdHandlerCapturePhoto(params);
+
+	if(strncmp((char*)params->payload, CMD_RING_ALARM, (int)params->payloadLen) == 0) {
+		cmdHandlerRingAlarm(params);
 	}
-	else if(strncmp((char*)params->payload, CMD_FR_FAILURE, (int)params->payloadLen) == 0) {
-		cmdHandlerFrFailure(params);
-	}
-	else if(strncmp((char*)params->payload, CMD_UPDATE_PASSCODE, strlen(CMD_UPDATE_PASSCODE)) == 0) {
-		cmdHandlerUpdatePasscode(params);
-	}
-	else if(strncmp((char*)params->payload, CMD_ASK_SECRET, (int)params->payloadLen) == 0) {
-		cmdHandlerAskSecret(params);
-	}
-	else if(strncmp((char*)params->payload, CMD_ALLOW_ACCESS, (int)params->payloadLen) == 0) {
-		cmdHandlerAllowAccess(params);
-	}
-	else if(strncmp((char*)params->payload, CMD_DENY_ACCESS, (int)params->payloadLen) == 0) {
-		cmdHandlerDenyAccess(params);
-	}
-	else if(strncmp((char*)params->payload, CMD_SMS_FAILED, (int)params->payloadLen) == 0) {
-		cmdHandlerSMSFailed(params);
-	}
+
+	// if(strncmp((char*)params->payload, CMD_CAPTURE_PHOTO, (int)params->payloadLen) == 0) {
+	// 	cmdHandlerCapturePhoto(params);
+	// }
+	// else if(strncmp((char*)params->payload, CMD_FR_FAILURE, (int)params->payloadLen) == 0) {
+	// 	cmdHandlerFrFailure(params);
+	// }
+	// else if(strncmp((char*)params->payload, CMD_UPDATE_PASSCODE, strlen(CMD_UPDATE_PASSCODE)) == 0) {
+	// 	cmdHandlerUpdatePasscode(params);
+	// }
+	// else if(strncmp((char*)params->payload, CMD_ASK_SECRET, (int)params->payloadLen) == 0) {
+	// 	cmdHandlerAskSecret(params);
+	// }
+	// else if(strncmp((char*)params->payload, CMD_ALLOW_ACCESS, (int)params->payloadLen) == 0) {
+	// 	cmdHandlerAllowAccess(params);
+	// }
+	// else if(strncmp((char*)params->payload, CMD_DENY_ACCESS, (int)params->payloadLen) == 0) {
+	// 	cmdHandlerDenyAccess(params);
+	// }
+	// else if(strncmp((char*)params->payload, CMD_SMS_FAILED, (int)params->payloadLen) == 0) {
+	// 	cmdHandlerSMSFailed(params);
+	// }
 }
 
 void disconnectCallbackHandler(AWS_IoT_Client *pClient, void *data) {
@@ -331,7 +346,7 @@ int main(int argc, char **argv) {
 	}
 
 	IOT_INFO("Subscribing...");
-	rc = aws_iot_mqtt_subscribe(&client, TOPIC_LOCKS_CMD, strlen(TOPIC_LOCKS_CMD), QOS0, iot_subscribe_callback_handler, NULL);
+	rc = aws_iot_mqtt_subscribe(&client, TOPIC_CMD, strlen(TOPIC_CMD), QOS0, iot_subscribe_callback_handler, NULL);
 	if(SUCCESS != rc) {
 		IOT_ERROR("Error subscribing : %d ", rc);
 		return rc;

@@ -1,16 +1,12 @@
 
-#define TOPIC_LOCKS_CMD		"locks/commands"
-#define TOPIC_LOCKS_IP		"locks/ip"
+#define TOPIC_CMD		"infantcribcamera/commands"
+#define TOPIC_IP		"infantcribcamera/ip"
 
-#define CMD_CAPTURE_PHOTO	"CAPTURE PHOTO"
-#define CMD_FR_FAILURE		"FACIAL VERIFICATION FAILED"
-#define CMD_UPDATE_PASSCODE	"UPDATE PASSCODE"
-#define CMD_ASK_SECRET		"ASK SECRET"
-#define CMD_ALLOW_ACCESS	"ALLOW ACCESS"
-#define CMD_DENY_ACCESS		"DENY ACCESS"
-#define CMD_SMS_FAILED		"SMS FAILED"
+#define CMD_RING_ALARM		"RING ALARM"
 
-#define POLLY_PROMPT_READY		"<speak>Doorlock is ready</speak>"
+#define POLLY_PROMPT_READY		"<speak>The infant crib camera is ready</speak>"
+#define POLLY_PROMPT_ATTENTION	"<speak>Attention! Your child appears to be sleeping in an unsafe position.</speak>"
+
 #define POLLY_PROMPT_LOOK_AT_CAMERA	"<speak>Hello! Please look at the camera. Remember to remove your glasses if you are wearing any.<break time='1s'/> Three. Two. One. And click!</speak>"
 #define POLLY_PROMPT_WAIT_A_MOMENT	"<speak>Please wait a moment.</speak>"
 #define POLLY_PROMPT_FR_FAILURE		"<speak>Nope. I could not find you on the expected guest list. Go away!</speak>"

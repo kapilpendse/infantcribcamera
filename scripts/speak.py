@@ -24,7 +24,7 @@ try:
         exit()	#nothing to synthesize
 
     response = polly.synthesize_speech(Text=sys.argv[1],
-                                        VoiceId="Joanna",
+                                        VoiceId="Brian",
                                         TextType="ssml",
                                         OutputFormat="mp3",
 					SampleRate="22050")

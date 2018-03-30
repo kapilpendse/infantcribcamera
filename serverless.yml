@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: aidoorlock
+service: infantcribcamera
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
@@ -30,68 +30,49 @@ provider:
     $ref: ./iamRoleStatements.json
 
 functions:
-  verifyFace:
-    handler: lambda/verifyFace.lambda_handler
-    name: aidoorlock-verifyFace
+  detectUnsafeSleepingPosture:
+    handler: lambda/detectUnsafeSleepingPosture.lambda_handler
+    name: infantcribcamera-detectUnsafeSleepingPosture
     environment:
-      GUEST_INFO_TABLE_NAME: ${file(.build/cloud_config.yml):guestInfoTableName}
+      PARENTS_TABLE_NAME: ${file(.build/cloud_config.yml):parents}
     events:
       - s3:
           bucket: ${file(.build/cloud_config.yml):bucketForImages}
           event: s3:ObjectCreated:*
           rules:
             - prefix: image
-  smsDeliveryHandler:
-    handler: lambda/smsDeliveryHandler.lambda_handler
-    name: aidoorlock-smsDeliveryHandler
-    environment:
-      GUEST_INFO_TABLE_NAME: ${file(.build/cloud_config.yml):guestInfoTableName}
-    events:
-      # - cloudwatchLog: 'DirectPublishToPhoneNumber'
-      # - cloudwatchLog: 'DirectPublishToPhoneNumber/Failure'
-      - cloudwatchLog: 'sns/${file(.build/cloud_config.yml):hostRegion}/${file(.build/cloud_config.yml):accountId}/DirectPublishToPhoneNumber'
-      - cloudwatchLog: 'sns/${file(.build/cloud_config.yml):hostRegion}/${file(.build/cloud_config.yml):accountId}/DirectPublishToPhoneNumber/Failure'
 
 
 resources:
   Resources:
-    AIDoorLockGuests:
+    Parents:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${file(.build/cloud_config.yml):guestInfoTableName}
+        TableName: ${file(.build/cloud_config.yml):parents}
         AttributeDefinitions:
-          - AttributeName: GuestId
+          - AttributeName: ParentId
             AttributeType: N
         KeySchema:
-          - AttributeName: GuestId
+          - AttributeName: ParentId
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-    LambdaInvokePermission:
-      Type: "AWS::Lambda::Permission"
-      Properties:
-        FunctionName: "aidoorlock-smsDeliveryHandler"
-        Action: "lambda:InvokeFunction"
-        Principal: "logs.${file(.build/cloud_config.yml):hostRegion}.amazonaws.com"
-        SourceAccount:
-          Ref: "AWS::AccountId"
-      DependsOn: SmsDeliveryHandlerLambdaFunction
-    AIDoorLockLogGroup:
-      Type: "AWS::Logs::LogGroup"
-      Properties:
-        LogGroupName: 'sns/${file(.build/cloud_config.yml):hostRegion}/${file(.build/cloud_config.yml):accountId}/DirectPublishToPhoneNumber'
-        RetentionInDays: 14
-    AIDoorLockFailureLogGroup:
-      Type: "AWS::Logs::LogGroup"
-      Properties:
-        LogGroupName: 'sns/${file(.build/cloud_config.yml):hostRegion}/${file(.build/cloud_config.yml):accountId}/DirectPublishToPhoneNumber/Failure'
-        RetentionInDays: 14
-    AIDoorLockThing:
+    # InfantCribCameraLogGroup:
+    #   Type: "AWS::Logs::LogGroup"
+    #   Properties:
+    #     LogGroupName: 'sns/${file(.build/cloud_config.yml):hostRegion}/${file(.build/cloud_config.yml):accountId}/DirectPublishToPhoneNumber'
+    #     RetentionInDays: 14
+    # InfantCribCameraFailureLogGroup:
+    #   Type: "AWS::Logs::LogGroup"
+    #   Properties:
+    #     LogGroupName: 'sns/${file(.build/cloud_config.yml):hostRegion}/${file(.build/cloud_config.yml):accountId}/DirectPublishToPhoneNumber/Failure'
+    #     RetentionInDays: 14
+    InfantCribCameraThing:
       Type: "AWS::IoT::Thing"
       Properties:
         ThingName: "${file(.build/cloud_config.yml):thingName}"
-    AIDoorLockThingPolicy:
+    InfantCribCameraThingPolicy:
       Type: "AWS::IoT::Policy"
       Properties:
         PolicyName: "${file(.build/cloud_config.yml):thingName}_Policy"
@@ -106,29 +87,10 @@ resources:
               Resource:
                 -
                   "*"
-    AIDoorBellThing:
-      Type: "AWS::IoT::Thing"
-      Properties:
-        ThingName: "${file(.build/cloud_config.yml):doorbellThingName}"
-    AIDoorBellThingPolicy:
-      Type: "AWS::IoT::Policy"
-      Properties:
-        PolicyName: "${file(.build/cloud_config.yml):doorbellThingName}_Policy"
-        PolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-            -
-              Effect: "Allow"
-              Action:
-                -
-                  "iot:*"
-              Resource:
-                -
-                  "*"
-    AIDoorLockSNSSuccessFeedback:
+    InfantCribCameraSNSSuccessFeedback:
       Type: "AWS::IAM::Role"
       Properties:
-        RoleName: "AIDoorLockSNSSuccessFeedback"
+        RoleName: "InfantCribCameraSNSSuccessFeedback"
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -141,7 +103,7 @@ resources:
                 - "sts:AssumeRole"
         Policies:
           -
-            PolicyName: "AIDoorLockSNSSuccessFeedbackInlinePolicy"
+            PolicyName: "InfantCribCameraSNSSuccessFeedbackInlinePolicy"
             PolicyDocument:
               Version: "2012-10-17"
               Statement:

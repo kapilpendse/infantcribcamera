@@ -1,21 +1,18 @@
 #!/bin/sh
 
-# Sets up the AIDoorLock 'thing'. For the thing to work, 'cloud' side functionality must also be set up. Run 'setup_cloud.sh' to do that.
+# Sets up the infantcribcamera 'thing'. For the thing to work, 'cloud' side functionality must also be set up. Run 'setup_cloud.sh' to do that.
 # Usage: ./setup_thing.sh
+
+AWS_CMD="/usr/local/bin/python /usr/local/bin/aws"
 
 HOST_REGION=$(cat .build/host_region.txt)
 S3_BUCKET_NAME=$(cat .build/bucket_name.txt)
-AWS_IOT_MQTT_HOST=$(aws --region $HOST_REGION iot describe-endpoint --output text)
+AWS_IOT_MQTT_HOST=$($AWS_CMD --region $HOST_REGION iot describe-endpoint --output text)
 AWS_IOT_MQTT_PORT="8883"
-AWS_IOT_MQTT_CLIENT_ID="ai-doorlock-$RANDOM"
+AWS_IOT_MQTT_CLIENT_ID="infantcribcamera-$RANDOM"
 AWS_IOT_THING_NAME=$(cat .build/thing_name.txt)
 AWS_IOT_THING_CERTIFICATE="certificate.pem.crt"
 AWS_IOT_THING_PRIVATE_KEY="private.pem.key"
-
-AWS_IOT_MQTT_CLIENT_ID_DOORBELL="ai-doorbell-$RANDOM"
-AWS_IOT_THING_NAME_DOORBELL=$(cat .build/doorbell_thing_name.txt)
-AWS_IOT_THING_CERTIFICATE_DOORBELL="doorbell-certificate.pem.crt"
-AWS_IOT_THING_PRIVATE_KEY_DOORBELL="doorbell-private.pem.key"
 
 ### CHECK PREREQUISITES ###
 
@@ -24,7 +21,7 @@ command -v python -V > /dev/null 2>&1 || { echo "Python was not detected. Aborti
 echo "python detected"
 
 # AWS CLI
-command -v aws --version > /dev/null 2>&1 || { echo "AWS CLI was not detected. Aborting." >&2; exit 1; }
+command -v $AWS_CMD --version > /dev/null 2>&1 || { echo "AWS CLI was not detected. Aborting." >&2; exit 1; }
 echo "aws cli detected"
 
 # make
@@ -36,7 +33,7 @@ command -v gcc --version > /dev/null 2>&1 || { echo "'gcc' was not detected. Abo
 echo "'gcc' detected"
 
 # Check if this repo is cloned inside the AWS IoT Device SDK source code
-if [[ $PWD != *'aws-iot-device-sdk-embedded-C-2.1.1/samples/linux/AIDoorLock' ]]; then
+if [[ $PWD != *'aws-iot-device-sdk-embedded-C-2.1.1/samples/linux/infantcribcamera' ]]; then
     echo "Not inside AWS IoT Device SDK for C 2.1.1. See 'How do I get set up?' section in README."
     exit 1
 else
@@ -98,6 +95,15 @@ elif [[ $OSTYPE == darwin* ]]; then
     command -v imagesnap -h > /dev/null 2>&1 || { echo "imagesnap not detected, installing." >&2; brew install imagesnap; }
 fi
 
+# Install fswatch (cross-platform filesystem change monitoring tool)
+if [[ $OSTYPE == "linux-gnu" ]]; then
+    echo "checking for fswatch"
+    command -v fswatch --version > /dev/null 2>&1 || { echo "fswatch not detected, installing." >&2; sudo apt-get install fswatch; }
+elif [[ $OSTYPE == darwin* ]]; then
+    echo "checking for fswatch"
+    command -v fswatch -h > /dev/null 2>&1 || { echo "fswatch not detected, installing." >&2; brew install fswatch; }
+fi
+
 # Setup AWS IOT params in aws_iot_config.h
 echo "generating file with IoT settings"
 cp aws_iot_config_template.h aws_iot_config.h
@@ -109,20 +115,9 @@ sed -i -e "s/PLACEHOLDER_MQTT_CLIENT_ID/$AWS_IOT_MQTT_CLIENT_ID/g" aws_iot_confi
 sed -i -e "s/PLACEHOLDER_THING_NAME/$AWS_IOT_THING_NAME/g" aws_iot_config.h
 sed -i -e "s/PLACEHOLDER_MQTT_CERT_FILENAME/$AWS_IOT_THING_CERTIFICATE/g" aws_iot_config.h
 sed -i -e "s/PLACEHOLDER_MQTT_PRIV_KEY_FILENAME/$AWS_IOT_THING_PRIVATE_KEY/g" aws_iot_config.h
-cp aws_iot_config_template.h aws_iot_config_doorbell.h
-sed -i -e "s/PLACEHOLDER_HOST_REGION/$HOST_REGION/g" aws_iot_config_doorbell.h
-sed -i -e "s/PLACEHOLDER_S3_BUCKET_NAME/$S3_BUCKET_NAME/g" aws_iot_config_doorbell.h
-sed -i -e "s/PLACEHOLDER_MQTT_HOST/$AWS_IOT_MQTT_HOST/g" aws_iot_config_doorbell.h
-sed -i -e "s/PLACEHOLDER_MQTT_PORT/$AWS_IOT_MQTT_PORT/g" aws_iot_config_doorbell.h
-sed -i -e "s/PLACEHOLDER_MQTT_CLIENT_ID/$AWS_IOT_MQTT_CLIENT_ID_DOORBELL/g" aws_iot_config_doorbell.h
-sed -i -e "s/PLACEHOLDER_THING_NAME/$AWS_IOT_THING_NAME_DOORBELL/g" aws_iot_config_doorbell.h
-sed -i -e "s/PLACEHOLDER_MQTT_CERT_FILENAME/$AWS_IOT_THING_CERTIFICATE_DOORBELL/g" aws_iot_config_doorbell.h
-sed -i -e "s/PLACEHOLDER_MQTT_PRIV_KEY_FILENAME/$AWS_IOT_THING_PRIVATE_KEY_DOORBELL/g" aws_iot_config_doorbell.h
 
-# Build aidoorlock
-echo "building aidoorlock"
+# Build infantcribcamera
+echo "building infantcribcamera"
 make || { echo "build failed."; >&2; exit 1; }
-echo "thing setup succeeded, upload a picture of the expected guest into the S3 bucket named '$S3_BUCKET_NAME', and then run ./aidoorlock"
-echo "wait for it to annouce that it is ready (unmute your speakers!), and then in another terminal window, in the same folder, run ./doorbell."
-echo "you should hear ding dong of a door bell, and then follow the instructions that the aidoorlock program speaks out"
+echo "thing setup succeeded, run ./infantcribcamera and follow instructions on the terminal"
 echo "happy demoing!"
