@@ -27,7 +27,7 @@
 #define AWS_S3_BUCKET_NAME             "kapilpen-infant-crib-images"
 #define AWS_IOT_MQTT_HOST              "a3o09r2gh017y9.iot.us-east-1.amazonaws.com"
 #define AWS_IOT_MQTT_PORT              8883
-#define AWS_IOT_MQTT_CLIENT_ID         "infantcribcamera-9727"
+#define AWS_IOT_MQTT_CLIENT_ID         "infantcribcamera-28628"
 #define AWS_IOT_MY_THING_NAME          "InfantCribCamera"
 #define AWS_IOT_ROOT_CA_FILENAME       "root-ca.pem"
 #define AWS_IOT_CERTIFICATE_FILENAME   "certificate.pem.crt"

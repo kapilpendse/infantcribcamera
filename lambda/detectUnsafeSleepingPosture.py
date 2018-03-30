@@ -71,7 +71,7 @@ def detectHuman(bucket, key):
     labels = rekResponse["Labels"]
     for l in labels:
         print("Label: " + l["Name"])
-        if l in humanLabels:
+        if l["Name"] in humanLabels:
             print("Human detected");
             return True;
 

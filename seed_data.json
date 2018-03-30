@@ -1,4 +1,4 @@
 {
 	"ParentId": {"N": "1"},
-	"PhoneNumber": {"S": "GUEST_PHONE_NUMBER"}
+	"PhoneNumber": {"S": "PARENT_PHONE_NUMBER"}
 }

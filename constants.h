@@ -2,7 +2,7 @@
 #define TOPIC_CMD		"infantcribcamera/commands"
 #define TOPIC_IP		"infantcribcamera/ip"
 
-#define CMD_RING_ALARM		"RING ALARM"
+#define CMD_RING_ALARM		"CHILD IS UNSAFE"
 
 #define POLLY_PROMPT_READY		"<speak>The infant crib camera is ready</speak>"
 #define POLLY_PROMPT_ATTENTION	"<speak>Attention! Your child appears to be sleeping in an unsafe position.</speak>"
